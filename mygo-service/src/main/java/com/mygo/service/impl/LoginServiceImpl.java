@@ -6,6 +6,7 @@ import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.UserMapper;
 import com.mygo.service.LoginService;
 import com.mygo.utils.JwtTool;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +33,15 @@ public class LoginServiceImpl implements LoginService {
         }
         //3.返回JWT令牌
         return jwtTool.createJWT(user.getId());
+    }
+
+    @Override
+    public User findByUserName(String username) {
+        return userMapper.getUserByUsername(username);
+    }
+
+    @Override
+    public void register(LoginDTO loginDTO) {
+        userMapper.add(loginDTO.getUsername(),loginDTO.getPassword());
     }
 }
