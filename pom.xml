@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,6 +25,7 @@
         <mybatis.plus>3.5.9</mybatis.plus>
         <mysql.connector.java>9.2.0</mysql.connector.java>
         <spring.security.rsa>1.1.5</spring.security.rsa>
+        <knife4j>4.5.0</knife4j>
     </properties>
 
     <dependencyManagement>
@@ -48,6 +49,11 @@
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-rsa</artifactId>
                 <version>${spring.security.rsa}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${knife4j}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

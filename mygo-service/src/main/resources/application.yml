@@ -24,3 +24,6 @@ mygo:
     key-password: mpw:/4VrGA1afDwyytMgtd2NIg==
     alias: mygo
     tokenTTL: 1h
+  project-info:
+    project-name: MYGO心理服务平台
+    version: v1.0
