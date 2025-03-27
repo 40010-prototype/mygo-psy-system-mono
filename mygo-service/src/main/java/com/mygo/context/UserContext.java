@@ -4,13 +4,13 @@ import com.mygo.domain.entity.User;
 
 public class UserContext {
 
-    private static final ThreadLocal<User> tl = new ThreadLocal<>();
+    private static final ThreadLocal<Long> tl = new ThreadLocal<>();
 
-    public static void saveUser(User user) {
-        tl.set(user);
+    public static void saveUser(Long userId) {
+        tl.set(userId);
     }
 
-    public static User getUser() {
+    public static Long getUser() {
         return tl.get();
     }
 
