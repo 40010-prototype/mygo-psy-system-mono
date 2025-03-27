@@ -6,6 +6,10 @@ spring:
     url: jdbc:mysql://${mygo.datasource.host}:${mygo.datasource.port}/${mygo.datasource.database}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     username: ${mygo.datasource.username}
     password: ${mygo.datasource.password}
+  data:
+    redis:
+      host: ${mygo.data.redis.host}
+      port: ${mygo.data.redis.port}
 logging:
   level:
     com.mygo: debug
@@ -23,7 +27,7 @@ mygo:
     store-password: mpw:/4VrGA1afDwyytMgtd2NIg==
     key-password: mpw:/4VrGA1afDwyytMgtd2NIg==
     alias: mygo
-    tokenTTL: 1h
+    tokenTTL: 7d
   project-info:
     project-name: MYGO心理服务平台
     version: v1.0

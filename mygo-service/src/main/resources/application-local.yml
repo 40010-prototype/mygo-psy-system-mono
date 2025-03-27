@@ -6,3 +6,7 @@ mygo:
     database: mygo
     username: mpw:5neyAWmmCSwI76gQ4Nogyw==
     password: mpw:0Be5ttoTZGH2uiH8iC9aww==
+  data:
+    redis:
+      host: localhost
+      port: 6379

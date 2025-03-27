@@ -12,13 +12,16 @@ import java.security.KeyPair;
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
+    /**
+     *非对称密钥管理,在jwt中用到
+     */
     @Bean
     public KeyPair keyPair(JwtProperties properties) {
         // 获取秘钥工厂
         KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(properties.getLocation(),
                 properties.getStorePassword()
                         .toCharArray());
-        //读取钥匙对
+        // 读取钥匙对
         return keyStoreKeyFactory.getKeyPair(properties.getAlias(), properties.getKeyPassword()
                 .toCharArray());
     }

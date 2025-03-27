@@ -1,6 +1,6 @@
 package com.mygo.result;
 
-import com.mygo.constant.ResultConstant;
+import com.mygo.constant.ResultCode;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,21 +16,21 @@ public class Result<T> implements Serializable {
 
     public static <T> Result<T> success() {
         Result<T> result = new Result<T>();
-        result.code = ResultConstant.SUCCESS;
+        result.code = ResultCode.SUCCESS;
         return result;
     }
 
     public static <T> Result<T> success(T object) {
         Result<T> result = new Result<T>();
         result.data = object;
-        result.code = ResultConstant.SUCCESS;
+        result.code = ResultCode.SUCCESS;
         return result;
     }
 
     public static <T> Result<T> error(String msg) {
         Result result = new Result<>();
         result.msg = msg;
-        result.code = ResultConstant.FAILURE;
+        result.code = ResultCode.FAILURE;
         return result;
     }
 }

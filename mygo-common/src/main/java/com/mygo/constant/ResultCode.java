@@ -1,6 +1,6 @@
 package com.mygo.constant;
 
-public class ResultConstant {
+public class ResultCode {
 
     public static final int SUCCESS = 1;
 
