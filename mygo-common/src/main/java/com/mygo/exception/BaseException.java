@@ -1,6 +1,5 @@
 package com.mygo.exception;
 
-import lombok.Data;
 import lombok.Getter;
 
 /**
@@ -10,7 +9,6 @@ import lombok.Getter;
 public class BaseException extends RuntimeException {
 
     private final int code;
-
 
     public BaseException(String msg, int code) {
         super(msg);

@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * 自定义异常处理器
+     */
     @ExceptionHandler(BaseException.class)
     public Object handleBadRequestException(BaseException e) {
         log.error("自定义异常 -> {} , 异常原因：{}  ", e.getClass()

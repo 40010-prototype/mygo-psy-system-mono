@@ -8,7 +8,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <!--不要使用这个以上的版本,别问我是怎么知道的-->
-        <version>3.1.12</version>
+        <version>3.3.4</version>
     </parent>
 
     <groupId>org.example</groupId>
@@ -26,6 +26,7 @@
         <mysql.connector.java>9.2.0</mysql.connector.java>
         <spring.security.rsa>1.1.5</spring.security.rsa>
         <knife4j>4.5.0</knife4j>
+        <mybatis.spring>3.0.4</mybatis.spring>
     </properties>
 
     <dependencyManagement>
@@ -39,6 +40,11 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis.plus}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis.spring}</version>
             </dependency>
             <dependency>
                 <groupId>com.mysql</groupId>
