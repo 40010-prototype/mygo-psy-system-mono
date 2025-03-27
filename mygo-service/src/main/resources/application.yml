@@ -17,9 +17,10 @@ logging:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler # 枚举类处理器
   global-config:
     db-config:
-      id-type: auto
+      id-type: auto # id自增
 
 mygo:
   jwt:

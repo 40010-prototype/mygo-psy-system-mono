@@ -1,8 +1,6 @@
 package com.mygo.context;
 
-import com.mygo.domain.entity.User;
-
-public class UserContext {
+public class AdminContext {
 
     private static final ThreadLocal<Long> tl = new ThreadLocal<>();
 

@@ -1,9 +1,8 @@
 package com.mygo.interceptor;
 
-import com.mygo.context.UserContext;
+import com.mygo.context.AdminContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -17,7 +16,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                              Object handler) throws Exception {
         //1.判断是否需要拦截
-        if (UserContext.getUser() == null) {
+        if (AdminContext.getUser() == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
