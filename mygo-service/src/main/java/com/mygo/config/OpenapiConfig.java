@@ -3,12 +3,10 @@ package com.mygo.config;
 import com.mygo.properties.ProjectInfoProperties;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 @EnableConfigurationProperties(ProjectInfoProperties.class)
 @Configuration
@@ -27,9 +25,7 @@ public class OpenapiConfig {
                         .description(projectInfoProperties.getProjectName() + "接口文档")
                         .version(projectInfoProperties.getVersion())
                         .contact(new Contact().name("eustia")
-                                .url("https://github.com/eustia"))
-                        .license(new License().name("Apache 2.0")
-                                .url("http://springdoc.org"))))
+                                .url("https://github.com/Eustia232"))))
                 .pathsToMatch("/admin/**")  // 接口请求路径规则
                 .build();
     }

@@ -13,7 +13,7 @@ import java.security.KeyPair;
 public class SecurityConfig {
 
     /**
-     *非对称密钥管理,在jwt中用到
+     * 非对称密钥管理,在jwt中用到
      */
     @Bean
     public KeyPair keyPair(JwtProperties properties) {

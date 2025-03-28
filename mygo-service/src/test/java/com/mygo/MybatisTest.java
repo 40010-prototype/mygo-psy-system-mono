@@ -17,13 +17,8 @@ public class MybatisTest {
 
 
     @Test
-    void testString() {
-        // 写入一条String数据
-        stringRedisTemplate.opsForValue()
-                .set("name", "虎哥");
-        // 获取string数据
-        Object name = stringRedisTemplate.opsForValue()
-                .get("name");
-        System.out.println("name = " + name);
+    void SqlExceptionTest() {
+        adminMapper.addAdmin("五河琴里", "123", "kk@qq.com");
+        adminMapper.addAdmin("五河琴里", "123", "kk@qq.com");
     }
 }

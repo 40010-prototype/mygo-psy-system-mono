@@ -31,11 +31,8 @@ public class SecretTest {
         // 生成 16 位随机 AES 密钥
         String randomKey = "fqOS7bGCn3sxsTIL";
         // 利用密钥对用户名加密
-        String username = AES.encrypt("mygomygo", randomKey);
-        System.out.println("username = " + username);
-        // 利用密钥对用户名加密
-        String password = AES.encrypt("wz20040607", randomKey);
-        System.out.println("password = " + password);
+        String text = AES.encrypt("YLgjz35ThdTAA2Ka", randomKey);
+        System.out.println("username = " + text);
     }
 
     @Test

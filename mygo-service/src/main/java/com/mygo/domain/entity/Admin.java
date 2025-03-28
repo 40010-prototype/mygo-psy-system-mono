@@ -10,12 +10,12 @@ import lombok.Data;
 
 @Data
 @TableName("admins")
-@Tag(name="用户实体",description="用户实体")
+@Tag(name = "用户实体", description = "用户实体")
 public class Admin {
 
     @TableId("admin_id")
     @Schema(description = "用户ID")
-    private long id;
+    private Long id;
 
     @TableField("name")
     @Schema(description = "用户名")

@@ -11,11 +11,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @Configuration
 public class MvcConfig extends WebMvcConfigurationSupport {
 
-    @Autowired
-    private LoginInterceptor loginInterceptor;
+
+    private final LoginInterceptor loginInterceptor;
+
+
+    private final RefreshInterceptor refreshInterceptor;
 
     @Autowired
-    private RefreshInterceptor refreshInterceptor;
+    public MvcConfig(LoginInterceptor loginInterceptor, RefreshInterceptor refreshInterceptor) {
+        this.loginInterceptor = loginInterceptor;
+        this.refreshInterceptor = refreshInterceptor;
+    }
 
     /**
      * 添加拦截器,拦截器顺序为函数调用顺序正序
@@ -26,7 +32,8 @@ public class MvcConfig extends WebMvcConfigurationSupport {
                 .addPathPatterns("/**");
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/admin/**")
-                .excludePathPatterns("/admin/login");
+                .excludePathPatterns("/admin/login")
+                .excludePathPatterns("/admin/register");
     }
 
 

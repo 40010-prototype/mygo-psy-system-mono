@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.constant.RedisConstant;
 import com.mygo.domain.dto.LoginDTO;
+import com.mygo.domain.dto.RegisterDTO;
 import com.mygo.domain.entity.Admin;
 import com.mygo.domain.vo.LoginVO;
 import com.mygo.exception.BadRequestException;
@@ -52,7 +53,7 @@ public class AdminServiceImpl implements AdminService {
         String json = objectMapper.writeValueAsString(admin);
         //这里不使用hash,因为要分别设置过期时间
         stringRedisTemplate.opsForValue()
-                .set(RedisConstant.JWT_KEY  + admin.getId(), json);
+                .set(RedisConstant.JWT_KEY + admin.getId(), json);
         //5.设置过期时间
         stringRedisTemplate.expire(RedisConstant.JWT_KEY + admin.getId(), RedisConstant.JWT_EXPIRE,
                 RedisConstant.JWT_EXPIRE_UNIT);
@@ -66,7 +67,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void register(LoginDTO loginDTO) {
-        adminMapper.add(loginDTO.getName(),loginDTO.getPassword());
+    public void register(RegisterDTO registerDTO) {
+        adminMapper.addAdmin(registerDTO.getName(), registerDTO.getPassword(), registerDTO.getEmail());
     }
 }

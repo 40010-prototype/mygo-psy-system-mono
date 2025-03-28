@@ -21,12 +21,12 @@ import java.util.Date;
 public class JwtTool {
 
     private final JWTSigner signer;
+    private final JwtProperties jwtProperties;
 
     @Autowired
-    private JwtProperties jwtProperties;
-
-    public JwtTool(KeyPair keyPair) {
+    public JwtTool(KeyPair keyPair, JwtProperties jwtProperties) {
         this.signer = JWTSignerUtil.createSigner("rs256", keyPair);
+        this.jwtProperties = jwtProperties;
     }
 
     public String createJWT(Long id) {

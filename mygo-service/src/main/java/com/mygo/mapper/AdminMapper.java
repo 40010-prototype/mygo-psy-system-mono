@@ -11,7 +11,6 @@ public interface AdminMapper extends BaseMapper<Admin> {
     @Select("select * from admins where name=#{name}")
     Admin getAdminByName(@Param("name") String name);
 
-    @Insert("insert into user(username,password,create_time,update_time)" +
-            " values(#{username},#{password},now(),now())")
-    void add(String username, String password);
+    @Insert("insert into admins(name,password,email) values(#{username},#{password},#{email})")
+    void addAdmin(String username, String password, String email);
 }

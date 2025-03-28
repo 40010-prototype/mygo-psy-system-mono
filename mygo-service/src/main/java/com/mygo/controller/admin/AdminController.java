@@ -2,13 +2,15 @@ package com.mygo.controller.admin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.domain.dto.LoginDTO;
-import com.mygo.domain.entity.Admin;
+import com.mygo.domain.dto.RegisterDTO;
 import com.mygo.domain.vo.LoginVO;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "用户接口")
 public class AdminController {
 
+    private final AdminService adminservice;
+
     @Autowired
-    private AdminService adminservice;
+    public AdminController(AdminService adminservice) {
+        this.adminservice = adminservice;
+    }
 
     @PostMapping("/login")
     @Operation(summary = "登陆")
@@ -31,17 +37,8 @@ public class AdminController {
 
     @PostMapping("/register")
     @Operation(summary = "注册")
-    public Result register(@RequestBody LoginDTO loginDTO) {
-        //查询
-        Admin admin = adminservice.findByUserName(loginDTO.getName());
-        if(admin == null) {
-            adminservice.register(loginDTO);
-            return Result.success();
-        }
-        else{
-            return Result.error("用户名已被占用");
-        }
-        //注册
-
+    public Result<Void> register(@RequestBody @Valid RegisterDTO registerDTO) {
+        adminservice.register(registerDTO);
+        return Result.success();
     }
 }

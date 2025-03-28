@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import lombok.NonNull;
 
 @Data
 @Tag(name = "登陆DTO", description = "登陆DTO")

@@ -1,13 +1,13 @@
 package com.mygo.interceptor;
 
 import cn.hutool.core.util.StrUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.constant.HeaderConstant;
 import com.mygo.constant.RedisConstant;
 import com.mygo.context.AdminContext;
 import com.mygo.utils.JwtTool;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,21 +18,23 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class RefreshInterceptor implements HandlerInterceptor {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final StringRedisTemplate stringRedisTemplate;
+
+    private final JwtTool jwtTool;
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
-
-    @Autowired
-    private JwtTool jwtTool;
+    public RefreshInterceptor(StringRedisTemplate stringRedisTemplate, JwtTool jwtTool) {
+        this.stringRedisTemplate = stringRedisTemplate;
+        this.jwtTool = jwtTool;
+    }
 
     /**
-     *获取请求头中的token,把信息保存在UserContext中,并刷新在redis中的该记录的有效时间.<br>
+     * 获取请求头中的token,把信息保存在UserContext中,并刷新在redis中的该记录的有效时间.<br>
      * 该拦截器无论怎样都会放行
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-                             Object handler) throws Exception {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                             @NonNull Object handler) {
         log.info("刷新拦截器正在拦截");
         //1.获取请求头中的token
         String token = request.getHeader(HeaderConstant.Admin_Token);
@@ -55,7 +57,7 @@ public class RefreshInterceptor implements HandlerInterceptor {
         AdminContext.saveUser(id);
         log.info("id成功保存在context");
         //5.刷新redis中该用户的有效时间
-        stringRedisTemplate.expire(RedisConstant.JWT_KEY + id,RedisConstant.JWT_EXPIRE,RedisConstant.JWT_EXPIRE_UNIT);
+        stringRedisTemplate.expire(RedisConstant.JWT_KEY + id, RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
         log.info("redis刷新成功");
         return true;
     }
@@ -64,7 +66,7 @@ public class RefreshInterceptor implements HandlerInterceptor {
      * 移除UserContext中的信息
      */
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler, Exception ex) {
         AdminContext.removeUser();
     }
 }
