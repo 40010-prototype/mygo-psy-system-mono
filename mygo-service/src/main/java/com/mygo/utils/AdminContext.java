@@ -1,4 +1,4 @@
-package com.mygo.context;
+package com.mygo.utils;
 
 public class AdminContext {
 

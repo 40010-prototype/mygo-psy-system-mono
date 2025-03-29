@@ -3,7 +3,7 @@ package com.mygo.interceptor;
 import cn.hutool.core.util.StrUtil;
 import com.mygo.constant.HeaderConstant;
 import com.mygo.constant.RedisConstant;
-import com.mygo.context.AdminContext;
+import com.mygo.utils.AdminContext;
 import com.mygo.utils.JwtTool;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

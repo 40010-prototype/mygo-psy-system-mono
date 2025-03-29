@@ -5,12 +5,19 @@ import com.mygo.domain.entity.Admin;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 public interface AdminMapper extends BaseMapper<Admin> {
 
-    @Select("select * from admins where name=#{name}")
+    @Select("SELECT * FROM admins WHERE name=#{name}")
     Admin getAdminByName(@Param("name") String name);
 
-    @Insert("insert into admins(name,password,email) values(#{username},#{password},#{email})")
+    @Insert("INSERT INTO admins(name, password, email) VALUES(#{username}, #{password}, #{email})")
     void addAdmin(String username, String password, String email);
+
+    @Select("SELECT email FROM admins WHERE name=#{name}")
+    String getEmailByName(String name);
+
+    @Update("UPDATE admins SET password=#{password} WHERE name=#{name}")
+    void updatePassword(@Param("name") String name, @Param("password") String password);
 }

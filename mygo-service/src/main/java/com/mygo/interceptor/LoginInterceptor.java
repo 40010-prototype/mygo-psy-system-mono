@@ -1,6 +1,6 @@
 package com.mygo.interceptor;
 
-import com.mygo.context.AdminContext;
+import com.mygo.utils.AdminContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
