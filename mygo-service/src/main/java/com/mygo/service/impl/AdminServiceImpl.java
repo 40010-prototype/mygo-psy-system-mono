@@ -6,11 +6,14 @@ import com.mygo.constant.RedisConstant;
 import com.mygo.domain.dto.LoginDTO;
 import com.mygo.domain.dto.RegisterDTO;
 import com.mygo.domain.dto.ResetPasswordDTO;
+import com.mygo.domain.dto.UserDTO;
 import com.mygo.domain.entity.Admin;
 import com.mygo.domain.vo.LoginVO;
 import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.AdminMapper;
+import com.mygo.result.Result;
 import com.mygo.service.AdminService;
+import com.mygo.utils.AdminContext;
 import com.mygo.utils.JwtTool;
 import com.mygo.utils.MailUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -115,5 +118,12 @@ public class AdminServiceImpl implements AdminService {
         }
         //3.修改密码
 
+    }
+
+    @Override
+    public Result<UserDTO> getUserInfo() {
+        long userId= AdminContext.getUser();
+        UserDTO userDTO= adminMapper.getUserDTOById(userId);
+        return Result.success(userDTO);
     }
 }

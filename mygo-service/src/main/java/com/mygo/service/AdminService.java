@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.domain.dto.LoginDTO;
 import com.mygo.domain.dto.RegisterDTO;
 import com.mygo.domain.dto.ResetPasswordDTO;
+import com.mygo.domain.dto.UserDTO;
 import com.mygo.domain.entity.Admin;
 import com.mygo.domain.vo.LoginVO;
+import com.mygo.result.Result;
 
 public interface AdminService {
 
@@ -19,4 +21,6 @@ public interface AdminService {
     String sendEmail(String name);
 
     void resetPassword(ResetPasswordDTO resetPasswordDTO);
+
+    Result<UserDTO> getUserInfo();
 }
