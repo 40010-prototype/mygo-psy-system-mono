@@ -1,7 +1,9 @@
 package com.mygo.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mygo.domain.dto.UserDTO;
 import com.mygo.domain.entity.Admin;
+import com.mygo.result.Result;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -20,4 +22,7 @@ public interface AdminMapper extends BaseMapper<Admin> {
 
     @Update("UPDATE admins SET password=#{password} WHERE name=#{name}")
     void updatePassword(@Param("name") String name, @Param("password") String password);
+
+    @Select("SELECT id,name,email,phone,role FROM admins WHERE id=#{id}")
+    UserDTO getUserDTOById(long id);
 }
