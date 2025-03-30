@@ -15,7 +15,6 @@ public class MybatisTest {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-
     @Test
     void SqlExceptionTest() {
         adminMapper.addAdmin("五河琴里", "123", "kk@qq.com");

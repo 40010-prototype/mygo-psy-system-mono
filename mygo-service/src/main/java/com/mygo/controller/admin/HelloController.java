@@ -6,7 +6,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -14,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
-@RequestMapping("/test")
+//@RequestMapping("/test")
 @Tag(name = "测试接口")
 public class HelloController {
 
@@ -29,7 +33,18 @@ public class HelloController {
     }
 
     @PostMapping("/complete")
-    public Result<Void> test(@RequestBody @Valid RegisterDTO registerDTO){
+    public Result<Void> test(@RequestBody @Valid RegisterDTO registerDTO) {
         return Result.success();
     }
+
+//    @GetMapping("/fxe.png")
+//    public ResponseEntity<Resource> image() {
+//        Resource resource = new ClassPathResource("PEG.png");
+//
+//        // 返回图片并设置响应头
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.IMAGE_JPEG)
+////                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"your-image.jpg\"")
+//                .body(resource);
+//    }
 }

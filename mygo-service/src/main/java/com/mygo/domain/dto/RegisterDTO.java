@@ -2,10 +2,8 @@ package com.mygo.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
@@ -18,7 +16,6 @@ public class RegisterDTO {
 
     @Schema(description = "密码")
     String password;
-
 
     //这里需要单独使用@NotBlank,因为@Email在输入为空时不会报错。
     @NotBlank(message = "邮箱不能为空")

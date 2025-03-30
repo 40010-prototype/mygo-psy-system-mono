@@ -1,5 +1,6 @@
 package com.mygo.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.constant.RedisConstant;
@@ -32,7 +33,6 @@ public class AdminServiceImpl implements AdminService {
     private final StringRedisTemplate stringRedisTemplate;
 
     private final MailUtils mailUtils;
-
 
     @Autowired
     public AdminServiceImpl(AdminMapper adminMapper, JwtTool jwtTool, StringRedisTemplate stringRedisTemplate, MailUtils mailUtils) {
@@ -91,7 +91,7 @@ public class AdminServiceImpl implements AdminService {
             throw new BadRequestException("用户名不存在");
         }
         //2.生成6为随机数字
-        String num = RandomStringUtils.randomNumeric(6);
+        String num = RandomUtil.randomNumbers(6);
         //3.发送邮件
         String subject = "验证码";
         String text = "你的验证码为：" + num;

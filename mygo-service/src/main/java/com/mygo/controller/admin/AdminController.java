@@ -42,7 +42,7 @@ public class AdminController {
     @PostMapping("/send-email")
     @Operation(summary = "忘记密码1:发送验证码")
     public Result<String> sendEmail(@RequestParam String name) {
-        String email=adminservice.sendEmail(name);
+        String email = adminservice.sendEmail(name);
         return Result.success(email);
     }
 

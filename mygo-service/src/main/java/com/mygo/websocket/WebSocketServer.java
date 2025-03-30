@@ -1,6 +1,5 @@
 package com.mygo.websocket;
 
-
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
@@ -9,7 +8,6 @@ import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +15,6 @@ import java.util.Map;
 @Component
 @ServerEndpoint("/ws")
 public class WebSocketServer {
-
 
     private static final Map<String, Session> sessionMap = new HashMap<>();
 
@@ -31,13 +28,20 @@ public class WebSocketServer {
         sessionMap.remove(session.getId());
     }
 
+    @OnMessage
+    public void onMessage(String message, Session session) {
+        System.out.println(message);
+        sendToAllClient(message);
+    }
+
     public void sendToAllClient(String message) {
         for (Session session : sessionMap.values()) {
             try {
                 //服务器向客户端发送消息
-                session.getBasicRemote().sendText(message);
+                session.getBasicRemote()
+                        .sendText(message);
             } catch (Exception e) {
-                log.error("向客户端发送消息失败",e);
+                log.error("向客户端发送消息失败", e);
             }
         }
     }

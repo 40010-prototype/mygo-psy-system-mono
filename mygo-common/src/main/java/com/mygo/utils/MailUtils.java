@@ -6,12 +6,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class MailUtils {
 
     private final JavaMailSender mailSender;
-
 
     @Value("${spring.mail.username}")
     private String from;
@@ -36,8 +34,5 @@ public class MailUtils {
         mailSender.send(message);
 
     }
-
-
-
 
 }

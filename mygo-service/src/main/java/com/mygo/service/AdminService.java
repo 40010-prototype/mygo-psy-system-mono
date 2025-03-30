@@ -13,7 +13,6 @@ public interface AdminService {
 
     Admin findByUserName(String username);
 
-
     void register(RegisterDTO registerDTO);
 
     String sendEmail(String name);
