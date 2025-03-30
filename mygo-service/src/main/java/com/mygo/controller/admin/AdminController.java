@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.domain.dto.LoginDTO;
 import com.mygo.domain.dto.RegisterDTO;
 import com.mygo.domain.dto.ResetPasswordDTO;
+import com.mygo.domain.dto.UserDTO;
 import com.mygo.domain.vo.LoginVO;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
+import com.mygo.utils.AdminContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -51,5 +53,11 @@ public class AdminController {
     public Result<String> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
         adminservice.resetPassword(resetPasswordDTO);
         return Result.success();
+    }
+
+    @GetMapping("/userInfo")
+    @Operation(summary = "获取用户信息")
+    public Result<UserDTO> userInfo() {
+        return  adminservice.getUserInfo();
     }
 }
