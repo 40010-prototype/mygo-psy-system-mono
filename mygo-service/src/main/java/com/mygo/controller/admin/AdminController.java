@@ -1,14 +1,13 @@
 package com.mygo.controller.admin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mygo.domain.dto.LoginDTO;
-import com.mygo.domain.dto.RegisterDTO;
+import com.mygo.domain.dto.AdminLoginDTO;
+import com.mygo.domain.dto.AdminRegisterDTO;
 import com.mygo.domain.dto.ResetPasswordDTO;
 import com.mygo.domain.dto.UserDTO;
-import com.mygo.domain.vo.LoginVO;
+import com.mygo.domain.vo.AdminLoginVO;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
-import com.mygo.utils.AdminContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -29,15 +28,15 @@ public class AdminController {
 
     @PostMapping("/login")
     @Operation(summary = "登陆")
-    public Result<LoginVO> login(@RequestBody LoginDTO loginDTO) throws JsonProcessingException {
-        LoginVO loginVO = adminservice.login(loginDTO);
-        return Result.success(loginVO);
+    public Result<AdminLoginVO> login(@RequestBody AdminLoginDTO adminLoginDTO) throws JsonProcessingException {
+        AdminLoginVO adminLoginVO = adminservice.login(adminLoginDTO);
+        return Result.success(adminLoginVO);
     }
 
     @PostMapping("/register")
     @Operation(summary = "注册")
-    public Result<Void> register(@RequestBody @Valid RegisterDTO registerDTO) {
-        adminservice.register(registerDTO);
+    public Result<Void> register(@RequestBody @Valid AdminRegisterDTO adminRegisterDTO) {
+        adminservice.register(adminRegisterDTO);
         return Result.success();
     }
 
@@ -58,6 +57,6 @@ public class AdminController {
     @GetMapping("/userInfo")
     @Operation(summary = "获取用户信息")
     public Result<UserDTO> userInfo() {
-        return  adminservice.getUserInfo();
+        return adminservice.getUserInfo();
     }
 }

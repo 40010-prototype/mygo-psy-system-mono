@@ -47,7 +47,7 @@ public class RefreshInterceptor implements HandlerInterceptor {
         log.info("token解析成功");
         //3.基于id在redis中查找用户
         String userinfo = stringRedisTemplate.opsForValue()
-                .get(RedisConstant.JWT_KEY + id);
+                .get(RedisConstant.ADMIN_JWT_KEY + id);
         log.info(userinfo);
         //如果info为空,放行
         if (StrUtil.isBlank(userinfo)) {
@@ -57,7 +57,7 @@ public class RefreshInterceptor implements HandlerInterceptor {
         AdminContext.saveUser(id);
         log.info("id成功保存在context");
         //5.刷新redis中该用户的有效时间
-        stringRedisTemplate.expire(RedisConstant.JWT_KEY + id, RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
+        stringRedisTemplate.expire(RedisConstant.ADMIN_JWT_KEY + id, RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
         log.info("redis刷新成功");
         return true;
     }
@@ -66,7 +66,8 @@ public class RefreshInterceptor implements HandlerInterceptor {
      * 移除UserContext中的信息
      */
     @Override
-    public void afterCompletion(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler, Exception ex) {
+    public void afterCompletion(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                @NonNull Object handler, Exception ex) {
         AdminContext.removeUser();
     }
 }

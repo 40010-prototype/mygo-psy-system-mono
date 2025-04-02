@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisConstant {
 
     //admin:login:token:{id)
-    public static final String JWT_KEY = "admin:login:token:";
+    public static final String ADMIN_JWT_KEY = "admin:login:token:";
 
     public static final int JWT_EXPIRE = 12;
 
@@ -17,5 +17,7 @@ public class RedisConstant {
     public static final int VERIFY_EXPIRE = 10;
 
     public static final TimeUnit VERIFY_EXPIRE_UNIT = TimeUnit.MINUTES;
+
+    public static final String USER_JWT_KEY = "user:login:token:";
 
 }

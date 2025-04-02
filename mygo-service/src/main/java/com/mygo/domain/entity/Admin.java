@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 
 @Data
-@TableName("admins")
+@TableName("admin")
 @Tag(name = "用户实体", description = "用户实体")
 public class Admin {
 

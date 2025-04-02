@@ -4,12 +4,12 @@ import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.constant.RedisConstant;
-import com.mygo.domain.dto.LoginDTO;
-import com.mygo.domain.dto.RegisterDTO;
+import com.mygo.domain.dto.AdminLoginDTO;
+import com.mygo.domain.dto.AdminRegisterDTO;
 import com.mygo.domain.dto.ResetPasswordDTO;
 import com.mygo.domain.dto.UserDTO;
 import com.mygo.domain.entity.Admin;
-import com.mygo.domain.vo.LoginVO;
+import com.mygo.domain.vo.AdminLoginVO;
 import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.AdminMapper;
 import com.mygo.result.Result;
@@ -17,7 +17,7 @@ import com.mygo.service.AdminService;
 import com.mygo.utils.AdminContext;
 import com.mygo.utils.JwtTool;
 import com.mygo.utils.MailUtils;
-import org.apache.commons.lang3.RandomStringUtils;
+import com.mygo.utils.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,8 @@ public class AdminServiceImpl implements AdminService {
     private final MailUtils mailUtils;
 
     @Autowired
-    public AdminServiceImpl(AdminMapper adminMapper, JwtTool jwtTool, StringRedisTemplate stringRedisTemplate, MailUtils mailUtils) {
+    public AdminServiceImpl(AdminMapper adminMapper, JwtTool jwtTool, StringRedisTemplate stringRedisTemplate,
+                            MailUtils mailUtils) {
         this.adminMapper = adminMapper;
         this.jwtTool = jwtTool;
         this.stringRedisTemplate = stringRedisTemplate;
@@ -48,42 +49,36 @@ public class AdminServiceImpl implements AdminService {
     /**
      * 根据用户名和密码登陆,如果顺利登陆,返回一个token
      *
-     * @param loginDTO 登陆DTO
+     * @param adminLoginDTO 登陆DTO
      * @return token
      */
     @Override
-    public LoginVO login(LoginDTO loginDTO) throws JsonProcessingException {
+    public AdminLoginVO login(AdminLoginDTO adminLoginDTO) throws JsonProcessingException {
         //1.根据用户名查找是否存在该用户
-        Admin admin = adminMapper.getAdminByName(loginDTO.getName());
+        Admin admin = adminMapper.getAdminByName(adminLoginDTO.getName());
         if (admin == null) {
             throw new BadRequestException("用户不存在");
         }
         //2.判断密码是否正确
-        if (!admin.getPassword()
-                .equals(loginDTO.getPassword())) {
+        if (!PasswordEncoder.matches(admin.getPassword(), adminLoginDTO.getPassword())) {
             throw new BadRequestException("密码错误");
         }
         //3.生成JWT令牌
         String jwt = jwtTool.createJWT(admin.getId());
         //4.将JWT保存在redis中
-        String json = objectMapper.writeValueAsString(admin);
         //这里不使用hash,因为要分别设置过期时间
         stringRedisTemplate.opsForValue()
-                .set(RedisConstant.JWT_KEY + admin.getId(), json);
+                .set(RedisConstant.ADMIN_JWT_KEY + admin.getId(), "");
         //5.设置过期时间
-        stringRedisTemplate.expire(RedisConstant.JWT_KEY + admin.getId(), RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
+        stringRedisTemplate.expire(
+                RedisConstant.ADMIN_JWT_KEY + admin.getId(), RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
         //6.返回token
-        return new LoginVO(jwt, admin.getRole());
+        return new AdminLoginVO(jwt, admin.getRole());
     }
 
     @Override
-    public Admin findByUserName(String username) {
-        return adminMapper.getAdminByName(username);
-    }
-
-    @Override
-    public void register(RegisterDTO registerDTO) {
-        adminMapper.addAdmin(registerDTO.getName(), registerDTO.getPassword(), registerDTO.getEmail());
+    public void register(AdminRegisterDTO adminRegisterDTO) {
+        adminMapper.addAdmin(adminRegisterDTO.getName(), adminRegisterDTO.getPassword(), adminRegisterDTO.getEmail());
     }
 
     @Override
@@ -101,7 +96,8 @@ public class AdminServiceImpl implements AdminService {
         mailUtils.sendMail(email, subject, text);
         //4.把数据存在redis中
         stringRedisTemplate.opsForValue()
-                .set(RedisConstant.VERIFY_KEY + name, num, RedisConstant.VERIFY_EXPIRE, RedisConstant.VERIFY_EXPIRE_UNIT);
+                .set(RedisConstant.VERIFY_KEY +
+                        name, num, RedisConstant.VERIFY_EXPIRE, RedisConstant.VERIFY_EXPIRE_UNIT);
         //5.返回邮箱（用于前端展示）
         return email;
     }
@@ -122,8 +118,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Result<UserDTO> getUserInfo() {
-        long userId= AdminContext.getUser();
-        UserDTO userDTO= adminMapper.getUserDTOById(userId);
+        long userId = AdminContext.getUser();
+        UserDTO userDTO = adminMapper.getUserDTOById(userId);
         return Result.success(userDTO);
     }
 }

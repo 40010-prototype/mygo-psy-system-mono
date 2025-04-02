@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Tag(name = "注册DTO", description = "注册DTO")
-public class RegisterDTO {
+public class AdminRegisterDTO {
 
     @Schema(description = "用户名")
     @NotBlank(message = "用户名不能为空")
@@ -22,4 +22,5 @@ public class RegisterDTO {
     @Email(message = "请输入正确的邮箱地址")
     @Schema(description = "邮箱")
     String email;
+
 }

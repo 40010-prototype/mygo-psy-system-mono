@@ -1,21 +1,18 @@
 package com.mygo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mygo.domain.dto.LoginDTO;
-import com.mygo.domain.dto.RegisterDTO;
+import com.mygo.domain.dto.AdminLoginDTO;
+import com.mygo.domain.dto.AdminRegisterDTO;
 import com.mygo.domain.dto.ResetPasswordDTO;
 import com.mygo.domain.dto.UserDTO;
-import com.mygo.domain.entity.Admin;
-import com.mygo.domain.vo.LoginVO;
+import com.mygo.domain.vo.AdminLoginVO;
 import com.mygo.result.Result;
 
 public interface AdminService {
 
-    LoginVO login(LoginDTO loginDTO) throws JsonProcessingException;
+    AdminLoginVO login(AdminLoginDTO adminLoginDTO) throws JsonProcessingException;
 
-    Admin findByUserName(String username);
-
-    void register(RegisterDTO registerDTO);
+    void register(AdminRegisterDTO adminRegisterDTO);
 
     String sendEmail(String name);
 

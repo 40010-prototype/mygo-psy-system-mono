@@ -21,6 +21,7 @@ public class WebSocketServer {
     @OnOpen
     public void onOpen(Session session) {
         sessionMap.put(session.getId(), session);
+        System.out.println("onOpen");
     }
 
     @OnClose
