@@ -1,6 +1,6 @@
 package com.mygo.interceptor;
 
-import com.mygo.utils.AdminContext;
+import com.mygo.utils.Context;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -17,7 +17,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                              @NonNull Object handler) throws Exception {
         //1.判断是否需要拦截
-        if (AdminContext.getUser() == null) {
+        if (Context.getId() == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }

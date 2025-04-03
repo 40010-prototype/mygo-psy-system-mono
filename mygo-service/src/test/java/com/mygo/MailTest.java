@@ -2,6 +2,8 @@ package com.mygo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import java.time.LocalDate;
 
 @SpringBootTest(args = "--mpw.key=fqOS7bGCn3sxsTIL")
+@EnableAutoConfiguration(exclude = WebSocketServletAutoConfiguration.class)
 public class MailTest {
 
     @Autowired

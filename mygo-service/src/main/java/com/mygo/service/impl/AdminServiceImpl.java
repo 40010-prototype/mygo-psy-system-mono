@@ -14,10 +14,7 @@ import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.AdminMapper;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
-import com.mygo.utils.AdminContext;
-import com.mygo.utils.JwtTool;
-import com.mygo.utils.MailUtils;
-import com.mygo.utils.PasswordEncoder;
+import com.mygo.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -37,13 +34,16 @@ public class AdminServiceImpl implements AdminService {
 
     private final MailUtils mailUtils;
 
+    private final IdTool idTool;
+
     @Autowired
     public AdminServiceImpl(AdminMapper adminMapper, JwtTool jwtTool, StringRedisTemplate stringRedisTemplate,
-                            MailUtils mailUtils) {
+                            MailUtils mailUtils, IdTool idTool) {
         this.adminMapper = adminMapper;
         this.jwtTool = jwtTool;
         this.stringRedisTemplate = stringRedisTemplate;
         this.mailUtils = mailUtils;
+        this.idTool = idTool;
     }
 
     /**
@@ -78,7 +78,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void register(AdminRegisterDTO adminRegisterDTO) {
-        adminMapper.addAdmin(adminRegisterDTO.getName(), adminRegisterDTO.getPassword(), adminRegisterDTO.getEmail());
+        adminMapper.addAdmin(idTool.getPersonId(), adminRegisterDTO.getName(), adminRegisterDTO.getPassword(),
+                adminRegisterDTO.getEmail());
     }
 
     @Override
@@ -118,7 +119,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Result<UserDTO> getUserInfo() {
-        long userId = AdminContext.getUser();
+        long userId = Context.getId();
         UserDTO userDTO = adminMapper.getUserDTOById(userId);
         return Result.success(userDTO);
     }

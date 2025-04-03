@@ -1,18 +1,18 @@
 package com.mygo.utils;
 
-public class AdminContext {
+public class Context {
 
     private static final ThreadLocal<Long> tl = new ThreadLocal<>();
 
-    public static void saveUser(Long userId) {
+    public static void saveId(Long userId) {
         tl.set(userId);
     }
 
-    public static Long getUser() {
+    public static Long getId() {
         return tl.get();
     }
 
-    public static void removeUser() {
+    public static void removeId() {
         tl.remove();
     }
 }

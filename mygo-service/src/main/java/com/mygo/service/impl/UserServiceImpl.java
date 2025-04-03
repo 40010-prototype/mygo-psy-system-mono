@@ -9,6 +9,7 @@ import com.mygo.domain.vo.UserLoginVO;
 import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.UserMapper;
 import com.mygo.service.UserService;
+import com.mygo.utils.IdTool;
 import com.mygo.utils.JwtTool;
 import com.mygo.utils.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,18 +27,22 @@ public class UserServiceImpl implements UserService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private final IdTool idTool;
+
     @Autowired
-    public UserServiceImpl(UserMapper userMapper, JwtTool jwtTool, StringRedisTemplate stringRedisTemplate) {
+    public UserServiceImpl(UserMapper userMapper, JwtTool jwtTool, StringRedisTemplate stringRedisTemplate,
+                           IdTool idTool) {
         this.userMapper = userMapper;
         this.jwtTool = jwtTool;
         this.stringRedisTemplate = stringRedisTemplate;
+        this.idTool = idTool;
     }
 
     @Override
     public void register(UserRegisterDTO userRegisterDTO) {
         String email = userRegisterDTO.getEmail();
         String password = userRegisterDTO.getPassword();
-        userMapper.addUser(email, password);
+        userMapper.addUser(idTool.getPersonId(), email, password);
     }
 
     @Override

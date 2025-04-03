@@ -20,7 +20,7 @@ public class SecurityConfig {
         // 获取秘钥工厂
         KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(properties.getLocation(),
                 properties.getStorePassword()
-                .toCharArray());
+                        .toCharArray());
         // 读取钥匙对
         return keyStoreKeyFactory.getKeyPair(properties.getAlias(), properties.getKeyPassword()
                 .toCharArray());

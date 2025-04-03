@@ -3,7 +3,7 @@ package com.mygo.interceptor;
 import cn.hutool.core.util.StrUtil;
 import com.mygo.constant.HeaderConstant;
 import com.mygo.constant.RedisConstant;
-import com.mygo.utils.AdminContext;
+import com.mygo.utils.Context;
 import com.mygo.utils.JwtTool;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,10 +54,11 @@ public class RefreshInterceptor implements HandlerInterceptor {
             return true;
         }
         //4.把用户信息保存在UserContext中
-        AdminContext.saveUser(id);
+        Context.saveId(id);
         log.info("id成功保存在context");
         //5.刷新redis中该用户的有效时间
-        stringRedisTemplate.expire(RedisConstant.ADMIN_JWT_KEY + id, RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
+        stringRedisTemplate.expire(
+                RedisConstant.ADMIN_JWT_KEY + id, RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
         log.info("redis刷新成功");
         return true;
     }
@@ -68,6 +69,6 @@ public class RefreshInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                 @NonNull Object handler, Exception ex) {
-        AdminContext.removeUser();
+        Context.removeId();
     }
 }
