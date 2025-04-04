@@ -8,14 +8,21 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 public class RedisLock implements Lock {
+
     private static final DefaultRedisScript<Long> UNLOCK_SCRIPT;
+
+
+    //TODO 写到常量类里
     private static String KEY_PREFIX = "Lock:";
+
     static {
         UNLOCK_SCRIPT = new DefaultRedisScript<>();
         UNLOCK_SCRIPT.setLocation(new ClassPathResource("unlock.lua"));
         UNLOCK_SCRIPT.setResultType(Long.class);
     }
+
     private String name;
+
     private StringRedisTemplate stringRedisTemplate;
 
     public RedisLock(String name, StringRedisTemplate stringRedisTemplate) {
@@ -45,4 +52,5 @@ public class RedisLock implements Lock {
                         .getId() + ""
         );
     }
+
 }

@@ -46,13 +46,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e) throws JsonProcessingException {
-
         List<String> errors = e.getBindingResult()
                 .getAllErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .toList();
-
         return ResponseEntity.status(HttpServletResponse.SC_BAD_REQUEST)
                 .body(Result.error(errors.toString()));
     }

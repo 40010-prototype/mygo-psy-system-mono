@@ -3,6 +3,7 @@ package com.mygo.service.impl;
 import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mygo.constant.ErrorMessage;
 import com.mygo.constant.RedisConstant;
 import com.mygo.domain.dto.AdminLoginDTO;
 import com.mygo.domain.dto.AdminRegisterDTO;
@@ -21,7 +22,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-
 
 @Slf4j
 @Service
@@ -50,10 +50,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 根据用户名和密码登陆,如果顺利登陆,返回一个token
+     * 登陆
      *
-     * @param adminLoginDTO 登陆DTO
-     * @return token
+     * @param adminLoginDTO 登陆DTO，包括如下字段：<br>
+     *                      用户名、密码
+     * @return jwt令牌、用户类型
      */
     @Override
     public AdminLoginVO login(AdminLoginDTO adminLoginDTO) throws JsonProcessingException {
@@ -61,11 +62,11 @@ public class AdminServiceImpl implements AdminService {
         //1.根据用户名查找是否存在该用户
         Admin admin = adminMapper.getAdminByName(adminLoginDTO.getName());
         if (admin == null) {
-            throw new BadRequestException("用户不存在");
+            throw new BadRequestException(ErrorMessage.USER_NOT_FOUND);
         }
         //2.判断密码是否正确
         if (!PasswordEncoder.matches(admin.getPassword(), adminLoginDTO.getPassword())) {
-            throw new BadRequestException("密码错误");
+            throw new BadRequestException(ErrorMessage.PASSWORD_ERROR);
         }
         log.info(String.valueOf(admin.toString()));
         //3.生成JWT令牌
@@ -81,23 +82,34 @@ public class AdminServiceImpl implements AdminService {
         return new AdminLoginVO(jwt, admin.getRole());
     }
 
+    /**
+     * 注册用户
+     * @param adminRegisterDTO 注册DTO，包括如下字段：<br>
+     *                         用户名、密码、邮箱、身份
+     */
     @Override
     public void register(AdminRegisterDTO adminRegisterDTO) {
-        adminMapper.addAdmin(idTool.getPersonId(), adminRegisterDTO.getName(), PasswordEncoder.encode(adminRegisterDTO.getPassword()),
-                adminRegisterDTO.getEmail(),adminRegisterDTO.getRole());
+        adminMapper.addAdmin(idTool.getPersonId(), adminRegisterDTO.getName(),
+                PasswordEncoder.encode(adminRegisterDTO.getPassword()),
+                adminRegisterDTO.getEmail(), adminRegisterDTO.getRole());
     }
 
+    /**
+     * 发送邮箱验证码
+     * @param name 用户名
+     * @return 用户邮箱
+     */
     @Override
     public String sendEmail(String name) {
         //1.通过用户名查询邮件
         String email = adminMapper.getEmailByName(name);
         if (email == null) {
-            throw new BadRequestException("用户名不存在");
+            throw new BadRequestException(ErrorMessage.USER_NOT_FOUND);
         }
         //2.生成6为随机数字
         String num = RandomUtil.randomNumbers(6);
         //3.发送邮件
-        String subject = "验证码";
+        String subject = "找回密码验证码";
         String text = "你的验证码为：" + num;
         mailUtils.sendMail(email, subject, text);
         //4.把数据存在redis中
@@ -108,6 +120,11 @@ public class AdminServiceImpl implements AdminService {
         return email;
     }
 
+    /**
+     * 检查用户发送的邮箱验证码。如果正确，重置密码。
+     * @param resetPasswordDTO 重置密码DTO，包括如下字段：<br>
+     *                         用户名，验证码，密码
+     */
     @Override
     public void resetPassword(ResetPasswordDTO resetPasswordDTO) {
         String name = resetPasswordDTO.getName();
@@ -115,8 +132,8 @@ public class AdminServiceImpl implements AdminService {
         String verificationCode = stringRedisTemplate.opsForValue()
                 .get(RedisConstant.ADMIN_VERIFY_KEY + name);
         //2.判断验证码是否正确
-        if (!Objects.equals(verificationCode, resetPasswordDTO.getVerificationCode())) {
-            throw new BadRequestException("验证码错误");
+        if (!Objects.equals(verificationCode, resetPasswordDTO.getVerifyCode())) {
+            throw new BadRequestException(ErrorMessage.VERIFY_CODE_ERROR);
         }
         //3.修改密码
         adminMapper.updatePassword(resetPasswordDTO.getName(), PasswordEncoder.encode(resetPasswordDTO.getPassword()));
@@ -128,4 +145,5 @@ public class AdminServiceImpl implements AdminService {
         UserDTO userDTO = adminMapper.getUserDTOById(userId);
         return Result.success(userDTO);
     }
+
 }

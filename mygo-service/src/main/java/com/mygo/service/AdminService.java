@@ -19,4 +19,5 @@ public interface AdminService {
     void resetPassword(ResetPasswordDTO resetPasswordDTO);
 
     Result<UserDTO> getUserInfo();
+
 }

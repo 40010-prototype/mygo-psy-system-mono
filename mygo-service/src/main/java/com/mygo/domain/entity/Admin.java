@@ -1,8 +1,5 @@
 package com.mygo.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.mygo.domain.enumeration.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,4 +26,5 @@ public class Admin {
 
     @Schema(description = "用户角色")
     private Role role;
+
 }

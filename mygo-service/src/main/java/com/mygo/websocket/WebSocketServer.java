@@ -25,42 +25,28 @@ import java.util.Objects;
 @Slf4j
 @Component
 //@ServerEndpoint("/chat/{device}")
-@ServerEndpoint(value = "/ws/{device}",configurator = WebSocketConfig.class)
+@ServerEndpoint(value = "/ws/{device}", configurator = WebSocketConfig.class)
 public class WebSocketServer {
-
 
     //建立一个双向哈希表
     private static final Map<String, Session> idToSessionMap = new HashMap<>();
 
-    private static final Map<Session,String> sessionToIdMap = new HashMap<>();
-
+    private static final Map<Session, String> sessionToIdMap = new HashMap<>();
 
     //这里必须要加static属性，因为接下来要注入的bean都是单例的，但是webSocketServer这个bean是多例的。
-
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static ChatService chatService;
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
     @Autowired
-    public void setWebSocketServer(AdminMapper adminMapper,UserMapper userMapper,ChatService chatService) {
-        WebSocketServer.chatService=chatService;
+    public void setWebSocketServer(AdminMapper adminMapper, UserMapper userMapper, ChatService chatService) {
+        WebSocketServer.chatService = chatService;
     }
-//
 
-//
-//    @Autowired
-//    public WebSocketServer(AdminMapper adminMapper, UserMapper userMapper) {
-//        this.adminMapper = adminMapper;
-//        this.userMapper = userMapper;
-////        this.chatService = chatService;
-//    }
-
-//    , @PathParam("info") String info
     @OnOpen
     public void onOpen(Session session, @PathParam("device") String device) throws IOException {
-        if(!Objects.equals(device, "admin")&&!Objects.equals(device,"user"))
-            session.close();
+        //将请求头中的用户id和请求路径中的管理端/用户端标识拼接，并和Session一起存入双向哈希表中
+        if (!Objects.equals(device, "admin") && !Objects.equals(device, "user")) session.close();
         Integer id = Context.getId();
         String key = device + "_" + id;
         idToSessionMap.put(key, session);
@@ -72,8 +58,6 @@ public class WebSocketServer {
     public void onError(Session session, Throwable throwable) {
     }
 
-
-
     @OnClose
     public void onClose(Session session) {
         String key = sessionToIdMap.get(session);
@@ -83,22 +67,30 @@ public class WebSocketServer {
 
     @OnMessage
     public void onMessage(String jsonMessage, Session session) throws JsonProcessingException {
+        /*1.根据Session查询发送方id
+        * 这里为什么不让发送者直接发一个id过来？
+        * 因为这样同样不知道发送者是用户端还是管理端的。
+        * 但是还是有不少弊端的。这里会尽快修改
+        * 后续让前端把发送者、接受者、发送方向一起传过来。
+         */
         MessageDTO messageDTO = objectMapper.readValue(jsonMessage, MessageDTO.class);
         String key = sessionToIdMap.get(session);
-        String toDevice= Objects.equals(key.split("_")[0], "admin") ?"admin":"user";
-        Message message = new Message(key,toDevice+messageDTO.getToId(),messageDTO.getMessageType(),messageDTO.getMessage());
+        String toDevice = Objects.equals(key.split("_")[0], "admin") ? "admin" : "user";
+        Message message = new Message(key,
+                toDevice + messageDTO.getToId(), messageDTO.getMessageType(), messageDTO.getMessage());
         chatService.receiveMessage(message);
     }
-
+    //单发消息
     public void sendMessage(Message message) throws JsonProcessingException {
-
         Session session = idToSessionMap.get(message.getToId());
         if (session != null) {
-            MessageVO messageVo=new MessageVO(Integer.valueOf(message.getToId()
-                    .split("_")[1]),message.getMessageType(), message.getMessage());
-            String text=objectMapper.writeValueAsString(messageVo);
-            session.getAsyncRemote().sendText(text);
+            MessageVO messageVo = new MessageVO(Integer.valueOf(message.getToId()
+                    .split("_")[1]), message.getMessageType(), message.getMessage());
+            String text = objectMapper.writeValueAsString(messageVo);
+            session.getAsyncRemote()
+                    .sendText(text);
         }
 
     }
+
 }

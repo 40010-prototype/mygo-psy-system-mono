@@ -1,5 +1,8 @@
 package com.mygo.utils;
 
+/**
+ * 把用户id存在threadLocal中（包括管理端和用户端）
+ */
 public class Context {
 
     private static final ThreadLocal<Integer> tl = new ThreadLocal<>();
@@ -15,4 +18,5 @@ public class Context {
     public static void removeId() {
         tl.remove();
     }
+
 }

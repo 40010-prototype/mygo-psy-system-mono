@@ -7,8 +7,13 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class Message {
+
     String fromId;
+
     String toId;
+
     MessageType messageType;
+
     String message;
+
 }

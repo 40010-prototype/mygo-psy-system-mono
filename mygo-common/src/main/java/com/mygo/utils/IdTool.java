@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * 自定义Id工具，利用redis实现全局Id。<br>
+ * 为了不和hutool中的IdUtil重名，改名为IdTool。
+ */
 @Component
 public class IdTool {
 
@@ -16,16 +20,18 @@ public class IdTool {
     }
 
     public int getPersonId() {
+        //查询redis中存的id，作为返回结果，并自增，作为下次使用
         String id = stringRedisTemplate.opsForValue()
                 .get(RedisConstant.PERSON_INDEX_KEY);
         if (id == null) {
             stringRedisTemplate.opsForValue()
-                    .set(RedisConstant.PERSON_INDEX_KEY, "0");
+                    .set(RedisConstant.PERSON_INDEX_KEY, RedisConstant.PERSON_INDEX_OFFSET);
             return 0;
         }
         int personId = Integer.parseInt(id);
         stringRedisTemplate.opsForValue()
-                .set(RedisConstant.PERSON_INDEX_KEY, String.valueOf(personId + 1));
+                .set(RedisConstant.PERSON_INDEX_KEY, String.valueOf(personId + RedisConstant.PERSON_INDEX_INCREMENT));
         return personId;
     }
+
 }

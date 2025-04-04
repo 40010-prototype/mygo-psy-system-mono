@@ -5,5 +5,6 @@ import com.mygo.domain.entity.Message;
 
 public interface ChatService {
 
-    void receiveMessage(Message message);
+    void receiveMessage(Message message) throws JsonProcessingException;
+
 }

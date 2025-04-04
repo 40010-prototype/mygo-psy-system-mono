@@ -15,4 +15,5 @@ public class AdminLoginDTO {
 
     @Schema(description = "密码")
     String password;
+
 }

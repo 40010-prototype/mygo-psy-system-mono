@@ -68,4 +68,5 @@ public class UserServiceImpl implements UserService {
         //6.返回token
         return new UserLoginVO(jwt, user.needCompleteInfo());
     }
+
 }

@@ -7,7 +7,9 @@ import lombok.Data;
 public class MessageDTO {
 
     Integer toId;
+
     MessageType messageType;
+
     String message;
 
 }

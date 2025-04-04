@@ -27,4 +27,5 @@ public class MailTest {
         message.setTo("a72807618@163.com");
         mailSender.send(message);
     }
+
 }

@@ -23,25 +23,30 @@ public class WebSocketConfig extends ServerEndpointConfig.Configurator {
 
     private static StringRedisTemplate stringRedisTemplate;
 
+    /**WebSocketConfig必须要有一个无参的构造函数。所以我们用这种方法依赖注入。
+     * 另外，由于WebSocket是多例的，其注入的bean要加static属性。
+     */
     @Autowired
-    public void SetWebSocketConfig(JwtTool jwtTool, StringRedisTemplate stringRedisTemplate) {
+    public void setWebSocketConfig(JwtTool jwtTool, StringRedisTemplate stringRedisTemplate) {
         WebSocketConfig.jwtTool = jwtTool;
         WebSocketConfig.stringRedisTemplate = stringRedisTemplate;
     }
 
+    //默认的serverEndpoint配置
     @Bean
     public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();
     }
 
     /**
-     * 建立握手时，连接前的操作
+     * 建立握手时，连接前的操作：检查发送方携带的JWT
      */
     @Override
     public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
-        //写在前面：当Sec-WebSocket-Protocol请求头不为空时,需要返回给前端相同的响应。
-        //所以如果不运行到最后就return，意思就是拒绝这次请求。
-        //另外，这里的异常不会被全局异常捕获类捕获，所以要放到try-catch中
+        /*当Sec-WebSocket-Protocol请求头不为空时,需要返回给前端相同的响应。否则无法建立连接。
+          所以如果不运行到最后就return，意思就是拒绝这次请求。
+          另外，这里的异常不会被全局异常捕获类捕获，所以要放到try-catch中
+         */
         try {
             //1.获取请求头中的token
             String token = request.getHeaders()

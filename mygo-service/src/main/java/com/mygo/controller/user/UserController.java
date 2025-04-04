@@ -4,6 +4,8 @@ import com.mygo.domain.dto.UserLoginDTO;
 import com.mygo.domain.dto.UserRegisterDTO;
 import com.mygo.result.Result;
 import com.mygo.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/user")
+@Tag(name="用户端接口")
 public class UserController {
 
     private final UserService userService;
@@ -22,14 +25,17 @@ public class UserController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "登录")
     public Result<Void> login(@RequestBody UserLoginDTO userLoginDTO) {
         System.out.println(userLoginDTO.getEmail() + " " + userLoginDTO.getPassword());
         return Result.success();
     }
 
     @PostMapping("/register")
+    @Operation(summary = "注册")
     public Result<Void> register(@RequestBody UserRegisterDTO userRegisterDTO) {
         userService.register(userRegisterDTO);
         return Result.success();
     }
+
 }

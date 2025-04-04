@@ -8,6 +8,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class AdminLoginVO {
+
     private String token;
+
     private Role role;
+
 }

@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 
 public class RedisConstant {
 
-
     //不管是admin端还是user端，统一用这个key，因为http和websocket的拦截器要做统一处理
     //不用担心键冲突，因为不会有admin和user的id是一样的
     //login:token:{id)
@@ -26,9 +25,10 @@ public class RedisConstant {
     //用于生成唯一id
     public static final String PERSON_INDEX_KEY = "index:person";
 
+    public static final String PERSON_INDEX_OFFSET = "721";
+
+    public static final Integer PERSON_INDEX_INCREMENT = 7;
+
     public static final String CHAT_INDEX_KEY = "index:chat";
-
-
-
 
 }

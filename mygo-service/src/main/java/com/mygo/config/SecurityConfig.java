@@ -25,4 +25,5 @@ public class SecurityConfig {
         return keyStoreKeyFactory.getKeyPair(properties.getAlias(), properties.getKeyPassword()
                 .toCharArray());
     }
+
 }

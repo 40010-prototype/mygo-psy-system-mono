@@ -30,19 +30,5 @@ public class HelloController {
         return Result.success(String.format("Hello world %d", count.incrementAndGet()));
     }
 
-    @PostMapping("/complete")
-    public Result<Void> test(@RequestBody @Valid AdminRegisterDTO adminRegisterDTO) {
-        return Result.success();
-    }
 
-//    @GetMapping("/fxe.png")
-//    public ResponseEntity<Resource> image() {
-//        Resource resource = new ClassPathResource("PEG.png");
-//
-//        // 返回图片并设置响应头
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.IMAGE_JPEG)
-////                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"your-image.jpg\"")
-//                .body(resource);
-//    }
 }

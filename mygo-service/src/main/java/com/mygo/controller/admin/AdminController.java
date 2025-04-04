@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/admin")
-@Tag(name = "用户接口")
+@Tag(name = "管理端接口")
 public class AdminController {
 
     private final AdminService adminservice;
@@ -44,14 +44,14 @@ public class AdminController {
     }
 
     @PostMapping("/send-email")
-    @Operation(summary = "忘记密码1:发送验证码")
+    @Operation(summary = "找回密码1：发送验证码")
     public Result<String> sendEmail(@RequestParam String name) {
         String email = adminservice.sendEmail(name);
         return Result.success(email);
     }
 
     @PostMapping("/reset-password")
-    @Operation(summary = "忘记密码2:更改密码")
+    @Operation(summary = "找回密码2：更改密码")
     public Result<String> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
         adminservice.resetPassword(resetPasswordDTO);
         return Result.success();
@@ -62,4 +62,5 @@ public class AdminController {
     public Result<UserDTO> userInfo() {
         return adminservice.getUserInfo();
     }
+
 }
