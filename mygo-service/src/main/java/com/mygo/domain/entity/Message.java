@@ -1,12 +1,14 @@
 package com.mygo.domain.entity;
 
 import com.mygo.domain.enumeration.MessageType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Message {
-    Long fromId;
-    Long toId;
+    String fromId;
+    String toId;
     MessageType messageType;
     String message;
 }

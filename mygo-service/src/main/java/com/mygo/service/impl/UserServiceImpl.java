@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     public void register(UserRegisterDTO userRegisterDTO) {
         String email = userRegisterDTO.getEmail();
         String password = userRegisterDTO.getPassword();
-        userMapper.addUser(idTool.getPersonId(), email, password);
+        userMapper.addUser(idTool.getPersonId(), email, PasswordEncoder.encode(password));
     }
 
     @Override
@@ -61,10 +61,10 @@ public class UserServiceImpl implements UserService {
         //4.将JWT保存在redis中
         //这里不使用hash,因为要分别设置过期时间
         stringRedisTemplate.opsForValue()
-                .set(RedisConstant.USER_JWT_KEY + user.getId(), "");
+                .set(RedisConstant.JWT_KEY + user.getId(), RedisConstant.JWT_VALUE);
         //5.设置过期时间
         stringRedisTemplate.expire(
-                RedisConstant.USER_JWT_KEY + user.getId(), RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
+                RedisConstant.JWT_KEY + user.getId(), RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
         //6.返回token
         return new UserLoginVO(jwt, user.needCompleteInfo());
     }

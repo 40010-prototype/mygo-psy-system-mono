@@ -43,22 +43,22 @@ public class RefreshInterceptor implements HandlerInterceptor {
             return true;
         }
         //2.基于token获取用户
-        Long id = jwtTool.parseJWT(token);
+        Integer id = jwtTool.parseJWT(token);
         log.info("token解析成功");
         //3.基于id在redis中查找用户
         String userinfo = stringRedisTemplate.opsForValue()
-                .get(RedisConstant.ADMIN_JWT_KEY + id);
+                .get(RedisConstant.JWT_KEY + id);
         log.info(userinfo);
         //如果info为空,放行
         if (StrUtil.isBlank(userinfo)) {
             return true;
         }
-        //4.把用户信息保存在UserContext中
+        //4.把用户信息保存在Context中
         Context.saveId(id);
         log.info("id成功保存在context");
         //5.刷新redis中该用户的有效时间
         stringRedisTemplate.expire(
-                RedisConstant.ADMIN_JWT_KEY + id, RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
+                RedisConstant.JWT_KEY + id, RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
         log.info("redis刷新成功");
         return true;
     }

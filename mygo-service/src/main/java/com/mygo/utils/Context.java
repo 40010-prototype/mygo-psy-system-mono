@@ -2,13 +2,13 @@ package com.mygo.utils;
 
 public class Context {
 
-    private static final ThreadLocal<Long> tl = new ThreadLocal<>();
+    private static final ThreadLocal<Integer> tl = new ThreadLocal<>();
 
-    public static void saveId(Long userId) {
+    public static void saveId(Integer userId) {
         tl.set(userId);
     }
 
-    public static Long getId() {
+    public static Integer getId() {
         return tl.get();
     }
 

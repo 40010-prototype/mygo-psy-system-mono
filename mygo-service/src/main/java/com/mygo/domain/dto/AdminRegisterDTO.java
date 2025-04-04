@@ -1,5 +1,6 @@
 package com.mygo.domain.dto;
 
+import com.mygo.domain.enumeration.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Email;
@@ -22,5 +23,7 @@ public class AdminRegisterDTO {
     @Email(message = "请输入正确的邮箱地址")
     @Schema(description = "邮箱")
     String email;
+
+    Role role;
 
 }

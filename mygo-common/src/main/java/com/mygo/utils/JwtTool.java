@@ -29,7 +29,7 @@ public class JwtTool {
         this.jwtProperties = jwtProperties;
     }
 
-    public String createJWT(Long id) {
+    public String createJWT(Integer id) {
         return JWT.create()
                 .setPayload("id", id)
                 .setExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getTokenTTL()
@@ -38,7 +38,7 @@ public class JwtTool {
                 .sign();
     }
 
-    public Long parseJWT(String token) {
+    public Integer parseJWT(String token) {
         //1.判断token是不是空
         if (token == null) {
             throw new UnauthorizedException("未登录");
@@ -71,7 +71,7 @@ public class JwtTool {
         }
         // 5.数据解析
         try {
-            return Long.valueOf(userPayload.toString());
+            return Integer.valueOf(userPayload.toString());
         } catch (RuntimeException e) {
             // 数据格式有误
             throw new UnauthorizedException("格式有误");

@@ -15,12 +15,15 @@ import com.mygo.mapper.AdminMapper;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
 import com.mygo.utils.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
+
+@Slf4j
 @Service
 public class AdminServiceImpl implements AdminService {
 
@@ -54,6 +57,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public AdminLoginVO login(AdminLoginDTO adminLoginDTO) throws JsonProcessingException {
+        log.info("登录服务");
         //1.根据用户名查找是否存在该用户
         Admin admin = adminMapper.getAdminByName(adminLoginDTO.getName());
         if (admin == null) {
@@ -63,23 +67,24 @@ public class AdminServiceImpl implements AdminService {
         if (!PasswordEncoder.matches(admin.getPassword(), adminLoginDTO.getPassword())) {
             throw new BadRequestException("密码错误");
         }
+        log.info(String.valueOf(admin.toString()));
         //3.生成JWT令牌
-        String jwt = jwtTool.createJWT(admin.getId());
+        String jwt = jwtTool.createJWT(admin.getAdminId());
         //4.将JWT保存在redis中
-        //这里不使用hash,因为要分别设置过期时间
         stringRedisTemplate.opsForValue()
-                .set(RedisConstant.ADMIN_JWT_KEY + admin.getId(), "");
+                .set(RedisConstant.JWT_KEY + admin.getAdminId(), RedisConstant.JWT_VALUE);
         //5.设置过期时间
         stringRedisTemplate.expire(
-                RedisConstant.ADMIN_JWT_KEY + admin.getId(), RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
+                RedisConstant.JWT_KEY + admin.getAdminId(), RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
+        log.info("redis设置成功");
         //6.返回token
         return new AdminLoginVO(jwt, admin.getRole());
     }
 
     @Override
     public void register(AdminRegisterDTO adminRegisterDTO) {
-        adminMapper.addAdmin(idTool.getPersonId(), adminRegisterDTO.getName(), adminRegisterDTO.getPassword(),
-                adminRegisterDTO.getEmail());
+        adminMapper.addAdmin(idTool.getPersonId(), adminRegisterDTO.getName(), PasswordEncoder.encode(adminRegisterDTO.getPassword()),
+                adminRegisterDTO.getEmail(),adminRegisterDTO.getRole());
     }
 
     @Override
@@ -97,7 +102,7 @@ public class AdminServiceImpl implements AdminService {
         mailUtils.sendMail(email, subject, text);
         //4.把数据存在redis中
         stringRedisTemplate.opsForValue()
-                .set(RedisConstant.VERIFY_KEY +
+                .set(RedisConstant.ADMIN_VERIFY_KEY +
                         name, num, RedisConstant.VERIFY_EXPIRE, RedisConstant.VERIFY_EXPIRE_UNIT);
         //5.返回邮箱（用于前端展示）
         return email;
@@ -108,13 +113,13 @@ public class AdminServiceImpl implements AdminService {
         String name = resetPasswordDTO.getName();
         //1.从redis读取验证码
         String verificationCode = stringRedisTemplate.opsForValue()
-                .get(RedisConstant.VERIFY_KEY + name);
+                .get(RedisConstant.ADMIN_VERIFY_KEY + name);
         //2.判断验证码是否正确
         if (!Objects.equals(verificationCode, resetPasswordDTO.getVerificationCode())) {
             throw new BadRequestException("验证码错误");
         }
         //3.修改密码
-
+        adminMapper.updatePassword(resetPasswordDTO.getName(), PasswordEncoder.encode(resetPasswordDTO.getPassword()));
     }
 
     @Override

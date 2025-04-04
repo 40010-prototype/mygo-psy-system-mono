@@ -11,9 +11,11 @@ import com.mygo.service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin")
 @Tag(name = "用户接口")
@@ -30,10 +32,11 @@ public class AdminController {
     @Operation(summary = "登陆")
     public Result<AdminLoginVO> login(@RequestBody AdminLoginDTO adminLoginDTO) throws JsonProcessingException {
         AdminLoginVO adminLoginVO = adminservice.login(adminLoginDTO);
+        log.info("adminLoginVO.toString()");
         return Result.success(adminLoginVO);
     }
 
-    @PostMapping("/register")
+    @PutMapping("/register")
     @Operation(summary = "注册")
     public Result<Void> register(@RequestBody @Valid AdminRegisterDTO adminRegisterDTO) {
         adminservice.register(adminRegisterDTO);

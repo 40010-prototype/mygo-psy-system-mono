@@ -10,7 +10,6 @@ public enum Role {
     SUPERVISOR("supervisor"),
     MANAGER("manager");
 
-    @EnumValue
     private final String value;
 
     Role(String value) {
