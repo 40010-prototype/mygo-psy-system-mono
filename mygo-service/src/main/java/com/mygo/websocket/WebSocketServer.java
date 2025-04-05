@@ -70,8 +70,12 @@ public class WebSocketServer {
         /*1.根据Session查询发送方id
         * 这里为什么不让发送者直接发一个id过来？
         * 因为这样同样不知道发送者是用户端还是管理端的。
-        * 但是还是有不少弊端的。这里会尽快修改
-        * 后续让前端把发送者、接受者、发送方向一起传过来。
+        * 另外一点就是，因为删除的时候要把对象从哈希表中移除，还是要建一个双向哈希表（也就是两个哈希表）
+        * 所以利用这个哈希表根据session查一下id也是顺手的事。
+        * 不过后续业务会拓展，督导可以和咨询师聊天、督导也可以和用户聊天。
+        * 我现在想到了两个解决方案：
+        * 1)让前端把发送者、接受者、发送方向一起传过来。（要传就干脆一起传过来）
+        * 2)每次都根据接受者id查一下哈希表。这样要查两次，分别是admin_{id)和user_{id},但因为查询本来就是平均O(1)的，也不会很麻烦。
          */
         MessageDTO messageDTO = objectMapper.readValue(jsonMessage, MessageDTO.class);
         String key = sessionToIdMap.get(session);
