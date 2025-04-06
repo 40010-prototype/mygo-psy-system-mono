@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.domain.entity.Message;
 import com.mygo.mapper.ChatMapper;
 import com.mygo.service.ChatService;
-import com.mygo.websocket.WebSocketServer;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,11 +14,11 @@ public class ChatServiceImpl implements ChatService {
 
     private final ChatMapper chatMapper;
 
-    private final WebSocketServer webSocketServer;
 
-    public ChatServiceImpl(ChatMapper chatMapper, WebSocketServer webSocketServer) {
+
+    public ChatServiceImpl(ChatMapper chatMapper) {
         this.chatMapper = chatMapper;
-        this.webSocketServer = webSocketServer;
+
     }
 
     /**
@@ -47,8 +46,6 @@ public class ChatServiceImpl implements ChatService {
             Integer consultId = chatMapper.getConsultId(fromId, toId);
             chatMapper.addMessage(consultId, message.getMessage(), message.getMessageType(), "admin");
         }
-        //4.通过WebSocket转发这次消息
-        webSocketServer.sendMessage(message);
 
     }
 

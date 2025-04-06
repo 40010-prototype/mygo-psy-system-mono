@@ -82,7 +82,10 @@ public class WebSocketServer {
         String toDevice = Objects.equals(key.split("_")[0], "admin") ? "admin" : "user";
         Message message = new Message(key,
                 toDevice + messageDTO.getToId(), messageDTO.getMessageType(), messageDTO.getMessage());
+        //2.在数据库中插入数据
         chatService.receiveMessage(message);
+        //3.转发消息。这步不放在chatService中是因为会造成循环依赖。
+        sendMessage(message);
     }
     //单发消息
     public void sendMessage(Message message) throws JsonProcessingException {
