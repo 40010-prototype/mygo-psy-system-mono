@@ -6,17 +6,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
-//@RequestMapping("/test")
+@RequestMapping("/test")
 @Tag(name = "测试接口")
 public class HelloController {
 
@@ -27,7 +24,7 @@ public class HelloController {
     public Result<String> hello(HttpServletRequest request) {
         String ip = request.getRemoteAddr();
         AtomicInteger count = countmap.computeIfAbsent(ip, k -> new AtomicInteger(0));
-        return Result.success(String.format("Hello world %d", count.incrementAndGet()));
+        return Result.success(String.format("Hello world %d from %s", count.incrementAndGet(),ip));
     }
 
 

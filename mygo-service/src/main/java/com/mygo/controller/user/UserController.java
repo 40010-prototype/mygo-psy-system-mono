@@ -2,6 +2,7 @@ package com.mygo.controller.user;
 
 import com.mygo.domain.dto.UserLoginDTO;
 import com.mygo.domain.dto.UserRegisterDTO;
+import com.mygo.domain.vo.UserLoginVO;
 import com.mygo.result.Result;
 import com.mygo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,9 +27,9 @@ public class UserController {
 
     @PostMapping("/login")
     @Operation(summary = "登录")
-    public Result<Void> login(@RequestBody UserLoginDTO userLoginDTO) {
-        System.out.println(userLoginDTO.getEmail() + " " + userLoginDTO.getPassword());
-        return Result.success();
+    public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) {
+        UserLoginVO userLoginVO = userService.login(userLoginDTO);
+        return Result.success(userLoginVO);
     }
 
     @PostMapping("/register")
