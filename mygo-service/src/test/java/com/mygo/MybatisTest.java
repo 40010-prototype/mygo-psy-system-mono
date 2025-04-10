@@ -2,6 +2,7 @@ package com.mygo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mygo.domain.entity.Admin;
 import com.mygo.domain.enumeration.Role;
 import com.mygo.mapper.AdminMapper;
 import com.mygo.mapper.ChatMapper;
@@ -35,7 +36,7 @@ public class MybatisTest {
 
     @Test
     void SqlExceptionTest() {
-        adminMapper.addAdmin(idTool.getPersonId(), "9舞夕弦", "123", "kkkkk@qq.com", Role.MANAGER);
+        Admin admin=adminMapper.getAdminByName("古怪之裤子");
     }
 
     @Test

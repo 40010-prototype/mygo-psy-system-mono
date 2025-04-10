@@ -30,7 +30,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     /**
      * 获取请求头中的token,把信息保存在UserContext中,并刷新在redis中的该记录的有效时间.<br>
-     * 该拦截器无论怎样都会放行
+     * 若token无效，则拦截
      */
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -38,8 +38,10 @@ public class LoginInterceptor implements HandlerInterceptor {
         log.info("刷新拦截器正在拦截");
         //1.获取请求头中的token
         String token = request.getHeader(HeaderConstant.TOKEN);
+        log.info(token);
         //如果token为空,拦截
         if (StrUtil.isBlank(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
         //2.基于token获取用户
@@ -51,6 +53,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         log.info(userinfo);
         //如果info为空,放行
         if (StrUtil.isBlank(userinfo)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
         //4.把用户信息保存在Context中

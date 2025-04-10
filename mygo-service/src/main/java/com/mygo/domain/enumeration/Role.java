@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public enum Role {
-    PSYCHOLOGIST("psychologist"),
+    COUNSELOR   ("counselor"),
     SUPERVISOR("supervisor"),
     MANAGER("manager");
 
@@ -13,6 +13,15 @@ public enum Role {
 
     Role(String value) {
         this.value = value;
+    }
+
+    public static Role fromValue(String value) {
+        for (Role role : Role.values()) {
+            if (role.getValue().equalsIgnoreCase(value)) {
+                return role;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
     }
 
     @JsonValue

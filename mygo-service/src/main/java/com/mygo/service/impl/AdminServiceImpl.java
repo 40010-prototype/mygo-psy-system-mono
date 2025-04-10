@@ -8,12 +8,11 @@ import com.mygo.constant.RedisConstant;
 import com.mygo.domain.dto.AdminLoginDTO;
 import com.mygo.domain.dto.AdminRegisterDTO;
 import com.mygo.domain.dto.ResetPasswordDTO;
-import com.mygo.domain.dto.UserDTO;
 import com.mygo.domain.entity.Admin;
+import com.mygo.domain.vo.AdminInfoVO;
 import com.mygo.domain.vo.AdminLoginVO;
 import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.AdminMapper;
-import com.mygo.result.Result;
 import com.mygo.service.AdminService;
 import com.mygo.utils.*;
 import lombok.extern.slf4j.Slf4j;
@@ -88,10 +87,10 @@ public class AdminServiceImpl implements AdminService {
      *                         用户名、密码、邮箱、身份
      */
     @Override
-    public void register(AdminRegisterDTO adminRegisterDTO) {
-        adminMapper.addAdmin(idTool.getPersonId(), adminRegisterDTO.getName(),
-                PasswordEncoder.encode(adminRegisterDTO.getPassword()),
-                adminRegisterDTO.getEmail(), adminRegisterDTO.getRole());
+    public void register(AdminRegisterDTO adminRegisterDTO) throws JsonProcessingException {
+        adminMapper.addAdmin(idTool.getPersonId(), adminRegisterDTO.getUsername(), adminRegisterDTO.getName(),
+                adminRegisterDTO.getEmail(), PasswordEncoder.encode(adminRegisterDTO.getPassword()),
+                adminRegisterDTO.getRole(), objectMapper.writeValueAsString(adminRegisterDTO.getProfile()));
     }
 
     /**
@@ -102,7 +101,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public String sendEmail(String name) {
         //1.通过用户名查询邮件
-        String email = adminMapper.getEmailByName(name);
+        String email = adminMapper.getEmailByAccountName(name);
         if (email == null) {
             throw new BadRequestException(ErrorMessage.USER_NOT_FOUND);
         }
@@ -140,10 +139,17 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Result<UserDTO> getUserInfo() {
-        long userId = Context.getId();
-        UserDTO userDTO = adminMapper.getUserDTOById(userId);
-        return Result.success(userDTO);
+    public AdminInfoVO getAdminInfo() {
+        Integer id = Context.getId();
+        Admin admin = adminMapper.getAdminById(id);
+        return AdminInfoVO.builder()
+                .id(admin.getAdminId().toString())
+                .name(admin.getRealName())
+                .username(admin.getAccountName())
+                .email(admin.getEmail())
+                .role(admin.getRole())
+                .createdAt(admin.getCreatedAt())
+                .build();
     }
 
 }

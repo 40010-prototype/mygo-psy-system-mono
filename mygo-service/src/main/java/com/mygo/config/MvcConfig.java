@@ -4,10 +4,7 @@ import com.mygo.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
@@ -48,5 +45,15 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/*.png")
                 .addResourceLocations("file:" + staticResourcePath);
     }
+
+
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**").allowedOrigins("http://172.30.150.34:63221").allowedMethods("GET", "POST", "OPTIONS", "PUT")
+//                .allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
+//                        "Access-Control-Request-Headers")
+//                .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+//                .maxAge(3600);
+//    }
 
 }

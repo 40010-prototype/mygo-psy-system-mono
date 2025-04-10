@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("用户不存在");
         }
         //2.判断密码是否正确
-        if (!PasswordEncoder.matches(user.getPassword(), user.getPassword())) {
+        if (!PasswordEncoder.matches(user.getPassword(), userLoginDTO.getPassword())) {
             throw new BadRequestException("密码错误");
         }
         //3.生成JWT令牌
