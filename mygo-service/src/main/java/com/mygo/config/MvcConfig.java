@@ -30,13 +30,13 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/admin/**")
-                .excludePathPatterns("/admin/login")
-                .excludePathPatterns("/admin/register")
-                .excludePathPatterns(HttpMethod.OPTIONS.toString())
-                .addPathPatterns("/user/**")
-                .excludePathPatterns("/user/login")
-                .excludePathPatterns("/user/register");
+                .addPathPatterns("/admin/**", "/user/**")
+                .excludePathPatterns(
+                    "/admin/login",
+                    "/admin/register",
+                    "/user/login",
+                    "/user/register"
+                );
     }
 
     /**
@@ -52,11 +52,10 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:61354") // 改成实际端口
+                .allowedOrigins("*")  // 允许所有来源，或者列出所有前端URL
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .exposedHeaders("*")
-                .allowCredentials(true)
                 .maxAge(3600);
     }
 
