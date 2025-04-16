@@ -44,9 +44,14 @@ public class ChatServiceImpl implements ChatService {
             chatMapper.addMessage(consultId, message.getMessage(), message.getMessageType(), "user");
         } else {
             Integer consultId = chatMapper.getConsultId(fromId, toId);
-            chatMapper.addMessage(consultId, message.getMessage(), message.getMessageType(), "admin");
+            chatMapper.addMessage(consultId, message.getMessage(), message.getMessageType(), "counselor");
         }
 
+    }
+
+    @Override
+    public Integer getMesaageId() {
+        return 0;
     }
 
 }

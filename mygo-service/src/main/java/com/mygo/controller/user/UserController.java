@@ -1,5 +1,6 @@
 package com.mygo.controller.user;
 
+import com.mygo.domain.dto.UserAddInfoDTO;
 import com.mygo.domain.dto.UserLoginDTO;
 import com.mygo.domain.dto.UserRegisterDTO;
 import com.mygo.domain.vo.UserLoginVO;
@@ -36,6 +37,13 @@ public class UserController {
     @Operation(summary = "注册")
     public Result<Void> register(@RequestBody UserRegisterDTO userRegisterDTO) {
         userService.register(userRegisterDTO);
+        return Result.success();
+    }
+
+    @PostMapping("/addInfo")
+    @Operation(summary = "添加信息")
+    public Result<Void> addInfo(@RequestBody UserAddInfoDTO userAddInfoDTO) {
+        userService.addInfo(userAddInfoDTO);
         return Result.success();
     }
 

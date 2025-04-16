@@ -7,4 +7,6 @@ public interface ChatService {
 
     void receiveMessage(Message message) throws JsonProcessingException;
 
+    Integer getMesaageId();
+
 }

@@ -1,10 +1,7 @@
 package com.mygo.mapper;
 
 import com.mygo.domain.entity.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface UserMapper {
@@ -15,5 +12,6 @@ public interface UserMapper {
     @Select("SELECT * FROM user WHERE email=#{email}")
     User selectUserByEmail(@Param("email") String email);
 
-
+    @Update("UPDATE user SET phone=#{phone} and gender=#{gender} and age=#{age} and emergency_contact=#{emergencyContact} and emergency_contact_phone=#{emergencyContactPhone} WHERE id=#{id}")
+    void updateInfo(String phone,String gender,Integer age,String emergencyContact,String emergencyContactPhone);
 }

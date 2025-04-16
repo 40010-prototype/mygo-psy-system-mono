@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.config.WebSocketConfig;
 import com.mygo.domain.dto.MessageDTO;
 import com.mygo.domain.entity.Message;
-import com.mygo.domain.vo.MessageVO;
+import com.mygo.domain.vo.UserMessageVO;
 import com.mygo.mapper.AdminMapper;
 import com.mygo.mapper.UserMapper;
 import com.mygo.service.ChatService;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -68,35 +69,41 @@ public class WebSocketServer {
     @OnMessage
     public void onMessage(String jsonMessage, Session session) throws JsonProcessingException {
         /*1.根据Session查询发送方id
-        * 这里为什么不让发送者直接发一个id过来？
-        * 因为这样同样不知道发送者是用户端还是管理端的。
-        * 另外一点就是，因为删除的时候要把对象从哈希表中移除，还是要建一个双向哈希表（也就是两个哈希表）
-        * 所以利用这个哈希表根据session查一下id也是顺手的事。
-        * 不过后续业务会拓展，督导可以和咨询师聊天、督导也可以和用户聊天。
-        * 我现在想到了两个解决方案：
-        * 1)让前端把发送者、接受者、发送方向一起传过来。（要传就干脆一起传过来）
-        * 2)每次都根据接受者id查一下哈希表。这样要查两次，分别是admin_{id)和user_{id},但因为查询本来就是平均O(1)的，也不会很麻烦。
+         * 这里为什么不让发送者直接发一个id过来？
+         * 因为这样同样不知道发送者是用户端还是管理端的。
+         * 另外一点就是，因为删除的时候要把对象从哈希表中移除，还是要建一个双向哈希表（也就是两个哈希表）
+         * 所以利用这个哈希表根据session查一下id也是顺手的事。
+         * 不过后续业务会拓展，督导可以和咨询师聊天、督导也可以和用户聊天。
+         * 我现在想到了两个解决方案：
+         * 1)让前端把发送者、接受者、发送方向一起传过来。（要传就干脆一起传过来）
+         * 2)每次都根据接受者id查一下哈希表。这样要查两次，分别是admin_{id)和user_{id},但因为查询本来就是平均O(1)的，也不会很麻烦。
          */
         MessageDTO messageDTO = objectMapper.readValue(jsonMessage, MessageDTO.class);
         String key = sessionToIdMap.get(session);
         String toDevice = Objects.equals(key.split("_")[0], "admin") ? "admin" : "user";
         Message message = new Message(key,
-                toDevice + messageDTO.getToId(), messageDTO.getMessageType(), messageDTO.getMessage());
+                toDevice + messageDTO.getToId(), messageDTO.getMessageType(), messageDTO.getMessage(), LocalDateTime.now());
         //2.在数据库中插入数据
         chatService.receiveMessage(message);
         //3.转发消息。这步不放在chatService中是因为会造成循环依赖。
-        sendMessage(message);
+        boolean isToUser = message.getToId()
+                .split("_")[0].equals("user");
+        if (isToUser)
+            sendMessageToUser(message);
     }
+
     //单发消息
-    public void sendMessage(Message message) throws JsonProcessingException {
-        Session session = idToSessionMap.get(message.getToId());
-        if (session != null) {
-            MessageVO messageVo = new MessageVO(Integer.valueOf(message.getToId()
-                    .split("_")[1]), message.getMessageType(), message.getMessage());
-            String text = objectMapper.writeValueAsString(messageVo);
-            session.getAsyncRemote()
-                    .sendText(text);
-        }
+    public void sendMessageToUser(Message message) throws JsonProcessingException {
+
+            Session session = idToSessionMap.get(message.getToId());
+            if (session != null) {
+                UserMessageVO userMessageVo = new UserMessageVO(Integer.valueOf(message.getToId()
+                        .split("_")[1]), message.getMessageType(), message.getMessage(),message.getTime());
+                String text = objectMapper.writeValueAsString(userMessageVo);
+                session.getAsyncRemote()
+                        .sendText(text);
+            }
+
 
     }
 
