@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/admin")
-
-@CrossOrigin(origins = "*")
 @Tag(name = "管理端接口")
 public class AdminController {
 
