@@ -1,11 +1,10 @@
-package com.mygo.domain.entity;
+package com.mygo.entity;
 
-import com.mygo.domain.enumeration.Role;
+import com.mygo.enumeration.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data

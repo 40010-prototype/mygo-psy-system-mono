@@ -5,12 +5,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.constant.ErrorMessage;
 import com.mygo.constant.RedisConstant;
-import com.mygo.domain.dto.AdminLoginDTO;
-import com.mygo.domain.dto.AdminRegisterDTO;
-import com.mygo.domain.dto.ResetPasswordDTO;
-import com.mygo.domain.entity.Admin;
-import com.mygo.domain.vo.AdminInfoVO;
-import com.mygo.domain.vo.AdminLoginVO;
+import com.mygo.dto.AdminLoginDTO;
+import com.mygo.dto.AdminRegisterDTO;
+import com.mygo.dto.ResetPasswordDTO;
+import com.mygo.entity.Admin;
+import com.mygo.vo.AdminInfoVO;
+import com.mygo.vo.AdminLoginVO;
 import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.AdminMapper;
 import com.mygo.service.AdminService;
@@ -143,7 +143,8 @@ public class AdminServiceImpl implements AdminService {
         Integer id = Context.getId();
         Admin admin = adminMapper.getAdminById(id);
         return AdminInfoVO.builder()
-                .id(admin.getAdminId().toString())
+                .id(admin.getAdminId()
+                        .toString())
                 .name(admin.getRealName())
                 .username(admin.getAccountName())
                 .email(admin.getEmail())

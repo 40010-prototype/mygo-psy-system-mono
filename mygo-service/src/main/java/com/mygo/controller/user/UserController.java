@@ -1,9 +1,9 @@
 package com.mygo.controller.user;
 
-import com.mygo.domain.dto.UserAddInfoDTO;
-import com.mygo.domain.dto.UserLoginDTO;
-import com.mygo.domain.dto.UserRegisterDTO;
-import com.mygo.domain.vo.UserLoginVO;
+import com.mygo.dto.UserAddInfoDTO;
+import com.mygo.dto.UserLoginDTO;
+import com.mygo.dto.UserRegisterDTO;
+import com.mygo.vo.UserLoginVO;
 import com.mygo.result.Result;
 import com.mygo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/user")
-@Tag(name="用户端接口")
+@Tag(name = "用户端接口")
 public class UserController {
 
     private final UserService userService;

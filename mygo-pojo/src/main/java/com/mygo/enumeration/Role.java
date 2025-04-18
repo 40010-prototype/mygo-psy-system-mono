@@ -1,11 +1,11 @@
-package com.mygo.domain.enumeration;
+package com.mygo.enumeration;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
 public enum Role {
-    COUNSELOR   ("counselor"),
+    COUNSELOR("counselor"),
     SUPERVISOR("supervisor"),
     MANAGER("manager");
 
@@ -17,7 +17,8 @@ public enum Role {
 
     public static Role fromValue(String value) {
         for (Role role : Role.values()) {
-            if (role.getValue().equalsIgnoreCase(value)) {
+            if (role.getValue()
+                    .equalsIgnoreCase(value)) {
                 return role;
             }
         }

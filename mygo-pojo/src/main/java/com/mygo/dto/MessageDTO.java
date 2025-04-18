@@ -1,6 +1,6 @@
-package com.mygo.domain.dto;
+package com.mygo.dto;
 
-import com.mygo.domain.enumeration.MessageType;
+import com.mygo.enumeration.MessageType;
 import lombok.Data;
 
 @Data

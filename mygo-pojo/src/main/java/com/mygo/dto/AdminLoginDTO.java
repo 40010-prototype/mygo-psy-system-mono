@@ -1,4 +1,4 @@
-package com.mygo.domain.dto;
+package com.mygo.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;

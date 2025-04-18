@@ -1,16 +1,15 @@
 package com.mygo.controller.admin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mygo.domain.dto.AdminLoginDTO;
-import com.mygo.domain.dto.AdminRegisterDTO;
-import com.mygo.domain.dto.ResetPasswordDTO;
-import com.mygo.domain.vo.AdminInfoVO;
-import com.mygo.domain.vo.AdminLoginVO;
+import com.mygo.dto.AdminLoginDTO;
+import com.mygo.dto.AdminRegisterDTO;
+import com.mygo.dto.ResetPasswordDTO;
+import com.mygo.vo.AdminInfoVO;
+import com.mygo.vo.AdminLoginVO;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +37,7 @@ public class AdminController {
 
     @PostMapping("/register")
     @Operation(summary = "注册")
-    public Result<Void> register(@RequestBody  AdminRegisterDTO adminRegisterDTO) throws JsonProcessingException {
+    public Result<Void> register(@RequestBody AdminRegisterDTO adminRegisterDTO) throws JsonProcessingException {
         adminService.register(adminRegisterDTO);
         return Result.success();
     }
@@ -57,11 +56,10 @@ public class AdminController {
         return Result.success();
     }
 
-
     @GetMapping("/adminInfo")
     @Operation(summary = "获取用户信息")
     public Result<AdminInfoVO> adminInfo() {
-        AdminInfoVO adminInfoVO=adminService.getAdminInfo();
+        AdminInfoVO adminInfoVO = adminService.getAdminInfo();
         return Result.success(adminInfoVO);
 //        return Result.success();
     }

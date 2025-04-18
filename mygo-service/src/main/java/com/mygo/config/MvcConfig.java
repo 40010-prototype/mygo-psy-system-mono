@@ -4,17 +4,19 @@ import com.mygo.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
+
     /**注意，要实现WebMvcConfigurer这个接口。这样的话，只会在原来的配置上根据这个配置类修改。<br>
-    * 如果继承了WebMvcConfigurationSupport这个抽象类，会覆盖原来所有的配置。
-    * */
+     * 如果继承了WebMvcConfigurationSupport这个抽象类，会覆盖原来所有的配置。
+     * */
 
     private final LoginInterceptor loginInterceptor;
-
 
     @Value("${mygo.static.img}")
     private String staticResourcePath;
@@ -32,10 +34,10 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/admin/**", "/user/**")
                 .excludePathPatterns(
-                    "/admin/login",
-                    "/admin/register",
-                    "/user/login",
-                    "/user/register"
+                        "/admin/login",
+                        "/admin/register",
+                        "/user/login",
+                        "/user/register"
                 );
     }
 
@@ -47,7 +49,6 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/*.png")
                 .addResourceLocations("file:" + staticResourcePath);
     }
-
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

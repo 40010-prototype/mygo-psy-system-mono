@@ -21,7 +21,7 @@ public interface AdminMapper {
 
     @Insert("INSERT INTO admin(admin_id, account_name, real_name, email, password,role,info) VALUES(#{id}, " +
             "#{accountName},#{realName},  #{email},#{password}, #{role},#{info})")
-    void addAdmin(Integer id, String accountName, String realName,  String email, String password,
+    void addAdmin(Integer id, String accountName, String realName, String email, String password,
                   Role role, String info);
 
     @Select("SELECT email FROM admin WHERE account_name=#{accountName}")

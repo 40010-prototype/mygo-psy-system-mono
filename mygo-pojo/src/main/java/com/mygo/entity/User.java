@@ -1,4 +1,4 @@
-package com.mygo.domain.entity;
+package com.mygo.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

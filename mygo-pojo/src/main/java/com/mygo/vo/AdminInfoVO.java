@@ -1,6 +1,7 @@
-package com.mygo.domain.vo;
+package com.mygo.vo;
 
-import com.mygo.domain.enumeration.Role;
+
+import com.mygo.enumeration.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class AdminInfoVO {
+
     @Schema(description = "用户ID")
     private String id;
 
@@ -28,4 +30,5 @@ public class AdminInfoVO {
     private Role role;
 
     private LocalDateTime createdAt;
+
 }

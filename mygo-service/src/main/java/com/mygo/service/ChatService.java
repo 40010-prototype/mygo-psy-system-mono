@@ -1,7 +1,7 @@
 package com.mygo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mygo.domain.entity.Message;
+import com.mygo.entity.Message;
 
 public interface ChatService {
 

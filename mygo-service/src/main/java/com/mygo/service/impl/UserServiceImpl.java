@@ -2,11 +2,11 @@ package com.mygo.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.constant.RedisConstant;
-import com.mygo.domain.dto.UserAddInfoDTO;
-import com.mygo.domain.dto.UserLoginDTO;
-import com.mygo.domain.dto.UserRegisterDTO;
-import com.mygo.domain.entity.User;
-import com.mygo.domain.vo.UserLoginVO;
+import com.mygo.dto.UserAddInfoDTO;
+import com.mygo.dto.UserLoginDTO;
+import com.mygo.dto.UserRegisterDTO;
+import com.mygo.entity.User;
+import com.mygo.vo.UserLoginVO;
 import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.UserMapper;
 import com.mygo.service.UserService;
@@ -72,7 +72,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addInfo(UserAddInfoDTO userAddInfoDTO) {
-        userMapper.updateInfo(userAddInfoDTO.getPhone(),userAddInfoDTO.getGender(),userAddInfoDTO.getAge(),userAddInfoDTO.getEmergencyContact(),userAddInfoDTO.getEmergencyContactPhone());
+        userMapper.updateInfo(userAddInfoDTO.getPhone(), userAddInfoDTO.getGender(), userAddInfoDTO.getAge(),
+                userAddInfoDTO.getEmergencyContact(), userAddInfoDTO.getEmergencyContactPhone());
     }
 
 }

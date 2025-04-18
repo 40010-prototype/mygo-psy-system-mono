@@ -14,6 +14,6 @@ public class ErrorMessage {
 
     public static final String EMPTY_DATA = "数据为空";
 
-    public static final String VERIFY_CODE_ERROR="验证码错误";
+    public static final String VERIFY_CODE_ERROR = "验证码错误";
 
 }

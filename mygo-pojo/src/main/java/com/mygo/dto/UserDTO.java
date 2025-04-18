@@ -1,6 +1,7 @@
-package com.mygo.domain.dto;
+package com.mygo.dto;
 
-import com.mygo.domain.enumeration.Role;
+
+import com.mygo.enumeration.Role;
 import lombok.Data;
 
 @Data

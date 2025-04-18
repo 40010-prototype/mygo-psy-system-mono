@@ -1,6 +1,6 @@
-package com.mygo.domain.vo;
+package com.mygo.entity;
 
-import com.mygo.domain.enumeration.MessageType;
+import com.mygo.enumeration.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-public class UserMessageVO {
+public class Message {
 
+    String fromId;
 
-
-    Integer fromId;
+    String toId;
 
     MessageType messageType;
 
     String message;
 
-
     LocalDateTime time;
+
 }

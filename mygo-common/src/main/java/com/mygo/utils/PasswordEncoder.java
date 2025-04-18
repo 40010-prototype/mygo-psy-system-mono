@@ -1,8 +1,6 @@
 package com.mygo.utils;
 
 import cn.hutool.core.util.RandomUtil;
-import com.mygo.constant.ErrorMessage;
-import com.mygo.exception.BadRequestException;
 import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;

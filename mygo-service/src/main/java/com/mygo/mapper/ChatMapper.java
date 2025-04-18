@@ -13,5 +13,4 @@ public interface ChatMapper {
             "#{messageType}, #{sender})")
     void addMessage(Integer consultId, String message, MessageType messageType, String sender);
 
-
 }

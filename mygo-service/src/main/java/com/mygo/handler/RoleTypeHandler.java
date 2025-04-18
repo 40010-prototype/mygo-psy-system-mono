@@ -30,10 +30,10 @@ public class RoleTypeHandler extends BaseTypeHandler<Role> {
         return Role.fromValue(roleStr);
     }
 
-
     @Override
     public Role getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String roleStr = cs.getString(columnIndex);
         return Role.fromValue(roleStr);
     }
+
 }

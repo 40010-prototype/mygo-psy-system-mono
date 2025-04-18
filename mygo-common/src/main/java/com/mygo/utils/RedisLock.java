@@ -11,7 +11,6 @@ public class RedisLock implements Lock {
 
     private static final DefaultRedisScript<Long> UNLOCK_SCRIPT;
 
-
     //TODO 写到常量类里
     private static String KEY_PREFIX = "Lock:";
 

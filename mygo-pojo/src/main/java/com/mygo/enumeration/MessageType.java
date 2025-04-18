@@ -1,4 +1,4 @@
-package com.mygo.domain.enumeration;
+package com.mygo.enumeration;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;

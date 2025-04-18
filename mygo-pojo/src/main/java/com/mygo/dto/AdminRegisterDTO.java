@@ -1,4 +1,4 @@
-package com.mygo.domain.dto;
+package com.mygo.dto;
 
 import com.mygo.domain.entity.Info;
 import com.mygo.domain.enumeration.Role;
@@ -16,7 +16,6 @@ public class AdminRegisterDTO {
     @NotBlank(message = "用户名不能为空")
     String username;
 
-
     String name;
 
     //这里需要单独使用@NotBlank,因为@Email在输入为空时不会报错。
@@ -27,11 +26,8 @@ public class AdminRegisterDTO {
 
     String phone;
 
-
     @Schema(description = "密码")
     String password;
-
-
 
     Role role;
 

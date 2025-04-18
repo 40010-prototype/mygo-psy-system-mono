@@ -18,6 +18,7 @@
     <modules>
         <module>mygo-service</module>
         <module>mygo-common</module>
+        <module>mygo-pojo</module>
     </modules>
 
     <properties>

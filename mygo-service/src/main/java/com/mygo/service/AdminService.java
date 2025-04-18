@@ -1,11 +1,11 @@
 package com.mygo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mygo.domain.dto.AdminLoginDTO;
-import com.mygo.domain.dto.AdminRegisterDTO;
-import com.mygo.domain.dto.ResetPasswordDTO;
-import com.mygo.domain.vo.AdminInfoVO;
-import com.mygo.domain.vo.AdminLoginVO;
+import com.mygo.dto.AdminLoginDTO;
+import com.mygo.dto.AdminRegisterDTO;
+import com.mygo.dto.ResetPasswordDTO;
+import com.mygo.vo.AdminInfoVO;
+import com.mygo.vo.AdminLoginVO;
 
 public interface AdminService {
 

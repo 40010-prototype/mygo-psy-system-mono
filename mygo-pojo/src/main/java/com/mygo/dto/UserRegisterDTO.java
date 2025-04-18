@@ -1,9 +1,9 @@
-package com.mygo.domain.dto;
+package com.mygo.dto;
 
 import lombok.Data;
 
 @Data
-public class UserLoginDTO {
+public class UserRegisterDTO {
 
     String email;
 

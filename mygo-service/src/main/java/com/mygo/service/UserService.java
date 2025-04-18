@@ -1,9 +1,9 @@
 package com.mygo.service;
 
-import com.mygo.domain.dto.UserAddInfoDTO;
-import com.mygo.domain.dto.UserLoginDTO;
-import com.mygo.domain.dto.UserRegisterDTO;
-import com.mygo.domain.vo.UserLoginVO;
+import com.mygo.dto.UserAddInfoDTO;
+import com.mygo.dto.UserLoginDTO;
+import com.mygo.dto.UserRegisterDTO;
+import com.mygo.vo.UserLoginVO;
 
 public interface UserService {
 

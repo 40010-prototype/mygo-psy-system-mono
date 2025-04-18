@@ -3,9 +3,9 @@ package com.mygo.websocket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.config.WebSocketConfig;
-import com.mygo.domain.dto.MessageDTO;
-import com.mygo.domain.entity.Message;
-import com.mygo.domain.vo.UserMessageVO;
+import com.mygo.dto.MessageDTO;
+import com.mygo.entity.Message;
+import com.mygo.vo.UserMessageVO;
 import com.mygo.mapper.AdminMapper;
 import com.mygo.mapper.UserMapper;
 import com.mygo.service.ChatService;
@@ -82,7 +82,9 @@ public class WebSocketServer {
         String key = sessionToIdMap.get(session);
         String toDevice = Objects.equals(key.split("_")[0], "admin") ? "admin" : "user";
         Message message = new Message(key,
-                toDevice + messageDTO.getToId(), messageDTO.getMessageType(), messageDTO.getMessage(), LocalDateTime.now());
+                toDevice +
+                        messageDTO.getToId(), messageDTO.getMessageType(), messageDTO.getMessage(),
+                LocalDateTime.now());
         //2.在数据库中插入数据
         chatService.receiveMessage(message);
         //3.转发消息。这步不放在chatService中是因为会造成循环依赖。
@@ -94,16 +96,14 @@ public class WebSocketServer {
 
     //单发消息
     public void sendMessageToUser(Message message) throws JsonProcessingException {
-
-            Session session = idToSessionMap.get(message.getToId());
-            if (session != null) {
-                UserMessageVO userMessageVo = new UserMessageVO(Integer.valueOf(message.getToId()
-                        .split("_")[1]), message.getMessageType(), message.getMessage(),message.getTime());
-                String text = objectMapper.writeValueAsString(userMessageVo);
-                session.getAsyncRemote()
-                        .sendText(text);
-            }
-
+        Session session = idToSessionMap.get(message.getToId());
+        if (session != null) {
+            UserMessageVO userMessageVo = new UserMessageVO(Integer.valueOf(message.getToId()
+                    .split("_")[1]), message.getMessageType(), message.getMessage(), message.getTime());
+            String text = objectMapper.writeValueAsString(userMessageVo);
+            session.getAsyncRemote()
+                    .sendText(text);
+        }
 
     }
 
