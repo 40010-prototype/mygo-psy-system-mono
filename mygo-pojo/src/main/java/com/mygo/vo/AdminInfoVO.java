@@ -1,6 +1,5 @@
 package com.mygo.vo;
 
-
 import com.mygo.enumeration.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

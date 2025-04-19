@@ -1,17 +1,14 @@
 package com.mygo.enumeration;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Getter;
 
-@Getter
-public enum MessageType implements ValueEnum {
-    TEXT("text"),
-    PHOTO("photo"),
-    FILE("file");
+public enum ConsultStatus implements ValueEnum {
+    PROGRESSING("progressing"),
+    FINISHED("finished");
 
     private final String value;
 
-    MessageType(String value) {
+    ConsultStatus(String value) {
         this.value = value;
     }
 

@@ -1,6 +1,5 @@
 package com.mygo.dto;
 
-
 import com.mygo.enumeration.Role;
 import lombok.Data;
 

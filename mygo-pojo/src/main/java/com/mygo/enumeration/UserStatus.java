@@ -1,22 +1,19 @@
 package com.mygo.enumeration;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Getter;
 
-@Getter
-public enum MessageType implements ValueEnum {
-    TEXT("text"),
-    PHOTO("photo"),
-    FILE("file");
+public enum UserStatus implements ValueEnum {
+    ACTIVE("active"),
+    UNACTIVE("unactive");
 
     private final String value;
 
-    MessageType(String value) {
+    UserStatus(String value) {
         this.value = value;
     }
 
-    @Override
     @JsonValue
+    @Override
     public String getValue() {
         return value;
     }

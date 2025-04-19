@@ -4,15 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.dto.AdminLoginDTO;
 import com.mygo.dto.AdminRegisterDTO;
 import com.mygo.dto.ResetPasswordDTO;
-import com.mygo.vo.AdminInfoVO;
-import com.mygo.vo.AdminLoginVO;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
+import com.mygo.vo.AdminInfoVO;
+import com.mygo.vo.AdminLoginVO;
+import com.mygo.vo.AdminSessionVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -61,7 +64,19 @@ public class AdminController {
     public Result<AdminInfoVO> adminInfo() {
         AdminInfoVO adminInfoVO = adminService.getAdminInfo();
         return Result.success(adminInfoVO);
-//        return Result.success();
+    }
+
+    @GetMapping("/session")
+    @Operation(summary = "获取会话列表")
+    public Result<List<AdminSessionVO>> getSession() {
+        List<AdminSessionVO> session = adminService.getSession();
+        return Result.success(session);
+    }
+
+    @GetMapping("/sessions/{sessionId}/messages")
+    public Result<Void> getMessages(@PathVariable Integer sessionId, @RequestParam("limit") Integer limit,
+                                    @RequestParam("offset") Integer offset) {
+        return Result.success();
     }
 
 }

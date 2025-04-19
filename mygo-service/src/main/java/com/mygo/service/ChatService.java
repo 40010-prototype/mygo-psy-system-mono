@@ -1,12 +1,14 @@
 package com.mygo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mygo.entity.Message;
+import com.mygo.dto.MessageFromToDTO;
 
 public interface ChatService {
 
-    void receiveMessage(Message message) throws JsonProcessingException;
+    void receiveMessage(MessageFromToDTO messageFromToDTO) throws JsonProcessingException;
 
-    Integer getMesaageId();
+    Integer getMessageId(MessageFromToDTO messageFromToDTO);
+
+    Integer getConsultId(MessageFromToDTO messageFromToDTO);
 
 }

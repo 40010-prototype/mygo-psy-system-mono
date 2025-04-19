@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
-public enum Role {
+public enum Role implements ValueEnum {
     COUNSELOR("counselor"),
     SUPERVISOR("supervisor"),
     MANAGER("manager");
@@ -15,18 +15,9 @@ public enum Role {
         this.value = value;
     }
 
-    public static Role fromValue(String value) {
-        for (Role role : Role.values()) {
-            if (role.getValue()
-                    .equalsIgnoreCase(value)) {
-                return role;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-
+    @Override
     @JsonValue
-    public String toJson() {
+    public String getValue() {
         return value;
     }
 }

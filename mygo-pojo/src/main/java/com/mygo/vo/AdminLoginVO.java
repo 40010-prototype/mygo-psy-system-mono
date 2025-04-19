@@ -1,6 +1,6 @@
 package com.mygo.vo;
 
-import com.mygo.domain.enumeration.Role;
+import com.mygo.enumeration.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

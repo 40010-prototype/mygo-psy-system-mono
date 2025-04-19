@@ -33,6 +33,8 @@ public class Admin {
 
     private String info;
 
+    private String avatar;
+
     private LocalDateTime createdAt;
 
 }

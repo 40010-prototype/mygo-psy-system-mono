@@ -1,7 +1,7 @@
 package com.mygo.dto;
 
-import com.mygo.domain.entity.Info;
-import com.mygo.domain.enumeration.Role;
+import com.mygo.entity.Info;
+import com.mygo.enumeration.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Email;

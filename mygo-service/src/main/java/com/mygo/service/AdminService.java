@@ -4,8 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.dto.AdminLoginDTO;
 import com.mygo.dto.AdminRegisterDTO;
 import com.mygo.dto.ResetPasswordDTO;
+import com.mygo.vo.AdminMessageVO;
 import com.mygo.vo.AdminInfoVO;
 import com.mygo.vo.AdminLoginVO;
+import com.mygo.vo.AdminSessionVO;
+
+import java.util.List;
 
 public interface AdminService {
 
@@ -18,5 +22,9 @@ public interface AdminService {
     void resetPassword(ResetPasswordDTO resetPasswordDTO);
 
     AdminInfoVO getAdminInfo();
+
+    List<AdminSessionVO> getSession();
+
+    List<AdminMessageVO> getMessages(Integer sessionId, Integer limit, Integer offset) throws JsonProcessingException;
 
 }
