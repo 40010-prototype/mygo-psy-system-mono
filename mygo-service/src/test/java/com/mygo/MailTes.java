@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @SpringBootTest(args = "--mpw.key=fqOS7bGCn3sxsTIL")
 @EnableAutoConfiguration(exclude = WebSocketServletAutoConfiguration.class)
-public class MailTest {
+public class MailTes {
 
     @Autowired
     private JavaMailSender mailSender;

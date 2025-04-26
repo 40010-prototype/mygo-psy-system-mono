@@ -55,4 +55,11 @@ public class GlobalExceptionHandler {
                 .body(Result.error(errors.toString()));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Result<Void>> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("异常原因：{}  ", e.getMessage());
+        return ResponseEntity.status(HttpServletResponse.SC_BAD_REQUEST)
+                .body(Result.error(e.getMessage()));
+    }
+
 }

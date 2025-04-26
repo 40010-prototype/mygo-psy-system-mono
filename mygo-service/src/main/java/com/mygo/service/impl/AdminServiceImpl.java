@@ -10,10 +10,7 @@ import com.mygo.dto.AdminLoginDTO;
 import com.mygo.dto.AdminRegisterDTO;
 import com.mygo.dto.LastMessageAndTime;
 import com.mygo.dto.ResetPasswordDTO;
-import com.mygo.entity.Admin;
-import com.mygo.entity.Consult;
-import com.mygo.entity.Message;
-import com.mygo.entity.User;
+import com.mygo.entity.*;
 import com.mygo.enumeration.Sender;
 import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.AdminMapper;
@@ -179,6 +176,7 @@ public class AdminServiceImpl implements AdminService {
         List<AdminSessionVO> sessions = new ArrayList<>();
         //2.构建VO
         for (Consult consult : consults) {
+            log.info(String.valueOf(consult.getUserId()));
             AdminSessionVO adminSessionVO = AdminSessionVO.builder()
                     .id(consult.getConsultId()
                             .toString())
@@ -189,14 +187,15 @@ public class AdminServiceImpl implements AdminService {
             User user = userMapper.selectUserById(consult.getUserId());
             adminSessionVO.setClientAvatar(user.getAvatar());
             adminSessionVO.setClientName(user.getName()
-                    .isBlank() ? user.getEmail() : user.getName());
+                    ==null ? user.getEmail() : user.getName());
             adminSessionVO.setStatus(user.getStatus());
             Admin admin = adminMapper.getAdminById(id);
-            adminSessionVO.setClientAvatar(admin.getAvatar());
-            adminSessionVO.setClientName(admin.getAccountName());
+            adminSessionVO.setCounselorAvatar(admin.getAvatar());
+            adminSessionVO.setCounselorName(admin.getAccountName());
             LastMessageAndTime lastMessageAndTime = chatMapper.getLastMessage(consult.getConsultId());
             adminSessionVO.setLastMessage(lastMessageAndTime.getMessage());
             adminSessionVO.setLastMessageTime(lastMessageAndTime.getTime());
+            sessions.add(adminSessionVO);
         }
         return sessions;
     }
@@ -233,5 +232,7 @@ public class AdminServiceImpl implements AdminService {
         }
         return messageVOs;
     }
+
+
 
 }

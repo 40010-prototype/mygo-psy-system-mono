@@ -66,9 +66,10 @@ public class AdminController {
         return Result.success(adminInfoVO);
     }
 
-    @GetMapping("/session")
+    @GetMapping("/sessions")
     @Operation(summary = "获取会话列表")
     public Result<List<AdminSessionVO>> getSession() {
+        log.info("start get session");
         List<AdminSessionVO> session = adminService.getSession();
         return Result.success(session);
     }

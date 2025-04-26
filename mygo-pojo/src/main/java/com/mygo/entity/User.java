@@ -1,14 +1,12 @@
 package com.mygo.entity;
 
 import com.mygo.enumeration.UserStatus;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@AllArgsConstructor
 @Data
 public class User {
 
-    private Integer id;
+    private Integer userId;
 
     private String email;
 
@@ -29,10 +27,5 @@ public class User {
     private String avatar;
 
     private UserStatus status;
-
-    public boolean needCompleteInfo() {
-        return !(this.name != null && this.phone != null && this.gender != null && this.age != null &&
-                this.emergencyContact != null && this.emergencyContactPhone != null);
-    }
 
 }

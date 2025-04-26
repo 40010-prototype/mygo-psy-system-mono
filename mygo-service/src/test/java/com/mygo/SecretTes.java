@@ -15,7 +15,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 
 @SpringBootTest(args = "--mpw.key=fqOS7bGCn3sxsTIL")
-public class SecretTest {
+public class SecretTes {
 
     @Autowired
     JwtProperties jwtProperties;

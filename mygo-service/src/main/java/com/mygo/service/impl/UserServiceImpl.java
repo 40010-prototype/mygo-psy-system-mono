@@ -58,16 +58,16 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("密码错误");
         }
         //3.生成JWT令牌
-        String jwt = jwtTool.createJWT(user.getId());
+        String jwt = jwtTool.createJWT(user.getUserId());
         //4.将JWT保存在redis中
         //这里不使用hash,因为要分别设置过期时间
         stringRedisTemplate.opsForValue()
-                .set(RedisConstant.JWT_KEY + user.getId(), RedisConstant.JWT_VALUE);
+                .set(RedisConstant.JWT_KEY + user.getUserId(), RedisConstant.JWT_VALUE);
         //5.设置过期时间
         stringRedisTemplate.expire(
-                RedisConstant.JWT_KEY + user.getId(), RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
+                RedisConstant.JWT_KEY + user.getUserId(), RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);
         //6.返回token
-        return new UserLoginVO(jwt, user.needCompleteInfo());
+        return new UserLoginVO(jwt, true);
     }
 
     @Override

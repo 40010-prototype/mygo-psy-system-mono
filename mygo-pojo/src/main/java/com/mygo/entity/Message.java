@@ -1,23 +1,29 @@
 package com.mygo.entity;
 
+import com.mygo.enumeration.MessageStatus;
 import com.mygo.enumeration.MessageType;
-import lombok.AllArgsConstructor;
+import com.mygo.enumeration.Sender;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 public class Message {
 
-    String fromId;
+    private Integer id;
 
-    String toId;
+    private Integer consultId;
 
-    MessageType messageType;
+    private MessageType messageType;
 
-    String message;
+    private String message;
 
-    LocalDateTime time;
+    private Sender sender;
+
+    private String meta;
+
+    private MessageStatus status;
+
+    private LocalDateTime time;
 
 }

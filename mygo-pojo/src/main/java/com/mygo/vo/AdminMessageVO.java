@@ -1,30 +1,33 @@
 package com.mygo.vo;
 
-
+import com.mygo.enumeration.MessageStatus;
 import com.mygo.enumeration.MessageType;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
+@Builder
 public class AdminMessageVO {
 
-    String id;
+    private String id;
 
-    String senderId;
+    private String senderId;
 
-    String receiverId;
+    private String receiverId;
 
-    String sessionID;
+    private String sessionId;
 
-    String content;
+    private String content;
 
-    LocalDateTime timestamp;
+    private LocalDateTime timestamp;
 
-    MessageType type;
+    private MessageType type;
 
-    String status;
+    private MessageStatus status;
 
-    String message;
+    private Map<String, Object> meta;
 
 }

@@ -36,7 +36,7 @@ public interface AdminMapper {
     @Update("UPDATE admin SET password=#{password} WHERE name=#{name}")
     void updatePassword(String name, String password);
 
-    @Select("select consult_id,user_id from consult where admin_id=#{adminId}")
+    @Select("select consult_id,user_id from consult_record where admin_id=#{adminId}")
     @Results({
             @Result(property = "status", column = "status", javaType = ConsultStatus.class, typeHandler =
                     EnumTypeHandler.class)

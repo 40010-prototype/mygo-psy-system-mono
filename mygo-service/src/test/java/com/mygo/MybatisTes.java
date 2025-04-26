@@ -3,8 +3,11 @@ package com.mygo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.entity.Admin;
+import com.mygo.entity.User;
+import com.mygo.enumeration.UserStatus;
 import com.mygo.mapper.AdminMapper;
 import com.mygo.mapper.ChatMapper;
+import com.mygo.mapper.UserMapper;
 import com.mygo.utils.IdTool;
 import com.mygo.utils.JwtTool;
 import org.junit.jupiter.api.Test;
@@ -13,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, args = "--mpw.key=fqOS7bGCn3sxsTIL")
-public class MybatisTest {
+public class MybatisTes {
 
     @Autowired
     private AdminMapper adminMapper;
@@ -33,6 +36,9 @@ public class MybatisTest {
     @Autowired
     private ChatMapper chatMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Test
     void SqlExceptionTest() {
         Admin admin = adminMapper.getAdminByName("古怪之裤子");
@@ -46,6 +52,17 @@ public class MybatisTest {
     @Test
     void SqlExceptionTest4() throws JsonProcessingException {
         System.out.println(jwtTool.createJWT(5));
+    }
+    @Test
+    void SqlExceptionTest5() throws JsonProcessingException {
+        User user=userMapper.selectUserById(1);
+        System.out.println(user.getStatus());
+    }
+    @Test
+    void SqlExceptionTest6() throws JsonProcessingException {
+        UserStatus userStatus=chatMapper.getUserStatus(340);
+        System.out.println(userStatus);
+
     }
 
 }
