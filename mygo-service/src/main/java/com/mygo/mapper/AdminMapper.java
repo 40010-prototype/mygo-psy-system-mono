@@ -70,22 +70,27 @@ public interface AdminMapper {
     @Insert("insert into date_status(admin_id,date) value(#{adminId},#{date})")
     void addScheduleStatus(Date date, Integer adminId);
 
-    @Update("update date_status set approval_status='approved' where schedule_id=#{scheduleId}")
+    @Update("update date_status set approval_status='approved' where id=#{scheduleId}")
     void approveScheduleByDay(Integer scheduleId);
 
     @Update("update schedule set approval_status='approved' where schedule_id=#{timeSlotId}")
     void approveScheduleByTimeSlot(Integer timeSlotId);
 
-    @Select("select date,approval_status from date_status where date between #{startDate} and #{endDate} and " +
+    @Select("select date,approval_status,approval_remark from date_status where date between #{startDate} and #{endDate} and " +
             "admin_id=#{adminId} order by date asc")
     @Result(property = "status", column = "approval_status", javaType = ScheduleStatus.class, typeHandler =
             EnumTypeHandler.class)
     List<DateAndStatusDTO> getDateAndStatusBetween(Date startDate, Date endDate, Integer adminId);
 
-    @Select("select id,start_time,end_time,status from schedule where date=#{date} and admin_id={adminId} order by " +
+    @Select("select id,start_time,end_time,status,remark,approval_status from schedule where date=#{date} and admin_id=#{adminId} order by " +
             "start_time asc")
-    @Result(property = "status", column = "status", javaType = ScheduleStatus.class, typeHandler =
-            EnumTypeHandler.class)
+    @Results({    @Result(property = "status", column = "status", javaType = TimeStatus.class, typeHandler =
+            EnumTypeHandler.class),
+            @Result(property = "approvalStatus",column = "approval_status",javaType = ScheduleStatus.class,typeHandler = EnumTypeHandler.class)
+
+    })
+
+
     List<TimeSlot> getTimeSlotByDateAndAdminId(Date date, Integer adminId);
 
     @Select("select counselor_id from manage where supervisor_id=#{supervisorId}")

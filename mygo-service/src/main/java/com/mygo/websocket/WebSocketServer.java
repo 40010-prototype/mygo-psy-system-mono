@@ -2,9 +2,12 @@ package com.mygo.websocket;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mygo.config.WebSocketConfig;
 import com.mygo.dto.MessageDTO;
 import com.mygo.dto.MessageFromToDTO;
+import com.mygo.enumeration.MessageStatus;
 import com.mygo.service.ChatService;
 import com.mygo.utils.Context;
 import com.mygo.vo.AdminMessageVO;
@@ -34,7 +37,17 @@ public class WebSocketServer {
     private static final Map<Session, String> sessionToIdMap = new HashMap<>();
 
     //这里必须要加static属性，因为接下来要注入的bean都是单例的，但是webSocketServer这个bean是多例的。
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final ObjectMapper objectMapper;
+    static {
+        objectMapper = new ObjectMapper();
+
+        // 注册 JavaTimeModule 以支持 Java 8 日期时间类（如 LocalDateTime）
+        objectMapper.registerModule(new JavaTimeModule());
+
+        // 禁用时间戳输出，使用 ISO-8601 格式的日期时间
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 
     private static ChatService chatService;
 
@@ -77,24 +90,30 @@ public class WebSocketServer {
          * 1)让前端把发送者、接受者、发送方向一起传过来。（要传就干脆一起传过来）
          * 2)每次都根据接受者id查一下哈希表。这样要查两次，分别是admin_{id)和user_{id},但因为查询本来就是平均O(1)的，也不会很麻烦。
          */
+        log.info(jsonMessage);
         MessageDTO messageDTO = objectMapper.readValue(jsonMessage, MessageDTO.class);
+        log.info(messageDTO.toString());
         String key = sessionToIdMap.get(session);
-        String toDevice = Objects.equals(key.split("_")[0], "admin") ? "admin" : "user";
-        MessageFromToDTO messageFromToDTO = new MessageFromToDTO(key, toDevice +
+        String toDevice = Objects.equals(key.split("_")[0], "admin") ? "user" : "admin";
+        MessageFromToDTO messageFromToDTO = new MessageFromToDTO(key, toDevice +"_"+
                 messageDTO.getToId(), messageDTO.getMessageType(), messageDTO.getMessage(), messageDTO.getMeta(),
                 LocalDateTime.now());
+        log.info("messageFromToDTO: " + messageFromToDTO.toString());
         //2.在数据库中插入数据
         chatService.receiveMessage(messageFromToDTO);
+
         //3.转发消息。这步不放在chatService中是因为会造成循环依赖。
         sendMessage(messageFromToDTO);
     }
 
     //双发消息
     public void sendMessage(MessageFromToDTO messageFromToDTO) throws JsonProcessingException {
+        log.info("开始转发消息");
         boolean isToUser = messageFromToDTO.getToId()
                 .split("_")[0].equals("user");
         Session userSession;
         Session adminSession;
+        log.info("isToUser: " + isToUser);
         if (isToUser) {
             userSession = idToSessionMap.get(messageFromToDTO.getToId());
             adminSession = idToSessionMap.get(messageFromToDTO.getFromId());
@@ -102,23 +121,30 @@ public class WebSocketServer {
             adminSession = idToSessionMap.get(messageFromToDTO.getToId());
             userSession = idToSessionMap.get(messageFromToDTO.getFromId());
         }
+
         if (userSession == null || adminSession == null) return;
+        log.info("adminSession: " + adminSession.getId());
         //处理移动端逻辑
         UserMessageVO userMessageVo = new UserMessageVO(Integer.valueOf(messageFromToDTO.getFromId()
                 .split("_")[1]), Integer.valueOf(messageFromToDTO.getToId()
                 .split("_")[1]), messageFromToDTO.getMessageType(), messageFromToDTO.getMessage(),
                 messageFromToDTO.getMeta(), messageFromToDTO.getTime());
+        log.info("userMessageVo: " + userMessageVo.toString());
         String text = objectMapper.writeValueAsString(userMessageVo);
+
+        log.info("移动端消息："+text);
         userSession.getAsyncRemote()
                 .sendText(text);
         //处理网页端逻辑
         AdminMessageVO adminMessageVO = AdminMessageVO.builder()
                 .content(messageFromToDTO.getMessage())
                 .meta(messageFromToDTO.getMeta())
+                .type(messageFromToDTO.getMessageType())
+                .status(MessageStatus.READ)
                 .receiverId(messageFromToDTO.getToId()
-                        .split("_")[0])
+                        .split("_")[1])
                 .senderId(messageFromToDTO.getFromId()
-                        .split("_")[0])
+                        .split("_")[1])
                 .timestamp(messageFromToDTO.getTime())
                 .build();
         adminMessageVO.setId(chatService.getMessageId(messageFromToDTO)
@@ -126,7 +152,7 @@ public class WebSocketServer {
         adminMessageVO.setSessionId(chatService.getConsultId(messageFromToDTO)
                 .toString());
         adminSession.getAsyncRemote()
-                .sendText(text);
+                .sendText(objectMapper.writeValueAsString(adminMessageVO));
     }
 
 }

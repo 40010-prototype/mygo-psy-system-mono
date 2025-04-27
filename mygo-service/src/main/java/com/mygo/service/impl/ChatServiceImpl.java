@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.dto.MessageFromToDTO;
 import com.mygo.mapper.ChatMapper;
 import com.mygo.service.ChatService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class ChatServiceImpl implements ChatService {
 
@@ -34,18 +36,20 @@ public class ChatServiceImpl implements ChatService {
                 .split("_")[1]);
         Integer fromId = Integer.valueOf(messageFromToDTO.getFromId()
                 .split("_")[1]);
+        log.info("isFromUser: " + isFromUser);
         if (isFromUser) {
             //if和else中逻辑相同，这里只作一处注释。
             //2.根据发送方和接收方查询消息对应的咨询id
             Integer consultId = chatMapper.getConsultId(toId, fromId);
+            log.info("consultId: " + consultId);
             //3.根据咨询id插入这条消息
             chatMapper.addMessage(consultId, messageFromToDTO.getMessage(), messageFromToDTO.getMessageType(), "user");
         } else {
             Integer consultId = chatMapper.getConsultId(fromId, toId);
             chatMapper.addMessage(consultId, messageFromToDTO.getMessage(), messageFromToDTO.getMessageType(),
-                    "counselor");
+                    "admin");
         }
-
+        log.info("插入消息数据完成");
     }
 
     @Override

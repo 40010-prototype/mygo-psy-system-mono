@@ -11,6 +11,8 @@ public interface UserMapper {
     void addUser(@Param("id") long id, @Param("email") String email, @Param("password") String password);
 
     @Select("SELECT * FROM user WHERE email=#{email}")
+    @Result(property = "status", column = "status", javaType = UserStatus.class, typeHandler =
+            EnumTypeHandler.class)
     User selectUserByEmail(@Param("email") String email);
 
     @Select("SELECT * FROM user WHERE user_id=#{userId}")

@@ -40,6 +40,8 @@ public interface AdminService {
 
     List<AdminScheduleVO> getScheduleByManager(Date startDate, Date endDate);
 
+    List<AdminScheduleVO> getPendingScheduleBySupervisor(Date startDate, Date endDate);
+
 }
 
 

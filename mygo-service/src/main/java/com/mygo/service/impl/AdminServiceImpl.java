@@ -8,6 +8,7 @@ import com.mygo.constant.ErrorMessage;
 import com.mygo.constant.RedisConstant;
 import com.mygo.dto.*;
 import com.mygo.entity.*;
+import com.mygo.enumeration.ScheduleStatus;
 import com.mygo.enumeration.Sender;
 import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.AdminMapper;
@@ -273,6 +274,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminScheduleVO getScheduleByCounselor(Date startDate, Date endDate) {
         Integer adminId = Context.getId();
+        log.info(adminId.toString());
         return getScheduleByCounselorAux(startDate, endDate, adminId);
 
     }
@@ -283,25 +285,76 @@ public class AdminServiceImpl implements AdminService {
         AdminScheduleVO adminScheduleVO = new AdminScheduleVO();
         adminScheduleVO.setCounselorName(adminName);
         adminScheduleVO.setId(adminId.toString());
+        log.info(adminScheduleVO.toString());
         List<ScheduleAndStatusDTO> schedules = new ArrayList<>();
         List<DateAndStatusDTO> dateAndStatusDTOS = adminMapper.getDateAndStatusBetween(startDate, endDate, adminId);
         for (DateAndStatusDTO dateAndStatus : dateAndStatusDTOS) {
-            ScheduleAndStatusDTO scheduleAndStatusDTO = new ScheduleAndStatusDTO();
-            scheduleAndStatusDTO.setDate(dateAndStatus.getDate());
-            scheduleAndStatusDTO.setStatus(dateAndStatus.getStatus());
-            List<TimeSlotDTO> timeSlotVOs = new ArrayList<>();
-            List<TimeSlot> timeSlots = adminMapper.getTimeSlotByDateAndAdminId(dateAndStatus.getDate(), adminId);
-            for (TimeSlot timeSlot : timeSlots) {
-                TimeSlotDTO timeSlotVO = TimeSlotDTO.builder()
-                        .startTime(timeSlot.getStartTime())
-                        .endTime(timeSlot.getEndTime())
-                        .status(timeSlot.getStatus())
-                        .id(timeSlot.toString())
-                        .build();
-                timeSlotVOs.add(timeSlotVO);
+            AddScheduleList(adminId, schedules, dateAndStatus);
+        }
+        adminScheduleVO.setSchedules(schedules);
+        adminScheduleVO.setOverallStatus(adminMapper.getCounselorStatusById(adminId));
+        return adminScheduleVO;
+    }
+
+    private void AddScheduleList(Integer adminId, List<ScheduleAndStatusDTO> schedules, DateAndStatusDTO dateAndStatus) {
+        ScheduleAndStatusDTO scheduleAndStatusDTO = new ScheduleAndStatusDTO();
+        scheduleAndStatusDTO.setDate(dateAndStatus.getDate());
+        scheduleAndStatusDTO.setStatus(dateAndStatus.getStatus());
+        scheduleAndStatusDTO.setApprovalRemark(dateAndStatus.getApprovalRemark());
+        List<TimeSlotDTO> timeSlotVOs = new ArrayList<>();
+        List<TimeSlot> timeSlots = adminMapper.getTimeSlotByDateAndAdminId(dateAndStatus.getDate(), adminId);
+        for (TimeSlot timeSlot : timeSlots) {
+            TimeSlotDTO timeSlotVO = TimeSlotDTO.builder()
+                    .startTime(timeSlot.getStartTime())
+                    .endTime(timeSlot.getEndTime())
+                    .status(timeSlot.getStatus())
+                    .approvalStatus(timeSlot.getApprovalStatus())
+                    .id(timeSlot.getId().toString())
+                    .remark(timeSlot.getRemark())
+                    .build();
+            timeSlotVOs.add(timeSlotVO);
+        }
+        scheduleAndStatusDTO.setTimeSlots(timeSlotVOs);
+        schedules.add(scheduleAndStatusDTO);
+    }
+
+    private AdminScheduleVO getPendingScheduleByCounselorAux(Date startDate, Date endDate, Integer adminId) {
+        String adminName = adminMapper.getAdminById(adminId)
+                .getAccountName();
+        AdminScheduleVO adminScheduleVO = new AdminScheduleVO();
+        adminScheduleVO.setCounselorName(adminName);
+        adminScheduleVO.setId(adminId.toString());
+        List<ScheduleAndStatusDTO> schedules = new ArrayList<>();
+        List<DateAndStatusDTO> dateAndStatusDTOS = adminMapper.getDateAndStatusBetween(startDate, endDate, adminId);
+        for (DateAndStatusDTO dateAndStatus : dateAndStatusDTOS) {
+            if(dateAndStatus.getStatus()== ScheduleStatus.PENDING){
+                AddScheduleList(adminId, schedules, dateAndStatus);
             }
-            scheduleAndStatusDTO.setTimeSlots(timeSlotVOs);
-            schedules.add(scheduleAndStatusDTO);
+            else{
+                ScheduleAndStatusDTO scheduleAndStatusDTO = new ScheduleAndStatusDTO();
+                scheduleAndStatusDTO.setDate(dateAndStatus.getDate());
+                scheduleAndStatusDTO.setStatus(dateAndStatus.getStatus());
+                scheduleAndStatusDTO.setApprovalRemark(dateAndStatus.getApprovalRemark());
+                List<TimeSlotDTO> timeSlotVOs = new ArrayList<>();
+                List<TimeSlot> timeSlots = adminMapper.getTimeSlotByDateAndAdminId(dateAndStatus.getDate(), adminId);
+                for (TimeSlot timeSlot : timeSlots) {
+                    if(timeSlot.getApprovalStatus()==ScheduleStatus.PENDING){
+                        TimeSlotDTO timeSlotVO = TimeSlotDTO.builder()
+                                .startTime(timeSlot.getStartTime())
+                                .endTime(timeSlot.getEndTime())
+                                .status(timeSlot.getStatus())
+                                .approvalStatus(timeSlot.getApprovalStatus())
+                                .id(timeSlot.toString())
+                                .remark(timeSlot.getRemark())
+                                .build();
+                        timeSlotVOs.add(timeSlotVO);
+                    }
+
+                }
+                scheduleAndStatusDTO.setTimeSlots(timeSlotVOs);
+                schedules.add(scheduleAndStatusDTO);
+            }
+
         }
         adminScheduleVO.setSchedules(schedules);
         adminScheduleVO.setOverallStatus(adminMapper.getCounselorStatusById(adminId));
@@ -325,6 +378,17 @@ public class AdminServiceImpl implements AdminService {
         List<AdminScheduleVO> adminScheduleVOS = new ArrayList<>();
         for (Integer counselorId : counselorIds) {
             adminScheduleVOS.add(getScheduleByCounselorAux(startDate, endDate,counselorId));
+        }
+        return adminScheduleVOS;
+    }
+
+    @Override
+    public List<AdminScheduleVO> getPendingScheduleBySupervisor(Date startDate, Date endDate) {
+        Integer supervisorId = Context.getId();
+        List<Integer> counselorIds=adminMapper.getCounselorBySupervisor(supervisorId);
+        List<AdminScheduleVO> adminScheduleVOS = new ArrayList<>();
+        for (Integer counselorId : counselorIds) {
+            adminScheduleVOS.add(getPendingScheduleByCounselorAux(startDate, endDate,counselorId));
         }
         return adminScheduleVOS;
     }

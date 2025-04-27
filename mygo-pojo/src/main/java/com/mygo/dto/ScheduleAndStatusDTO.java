@@ -15,4 +15,7 @@ public class ScheduleAndStatusDTO {
 
     private ScheduleStatus status;
 
+    private String approvalRemark;
+
+
 }

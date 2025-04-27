@@ -1,15 +1,21 @@
-package com.mygo.entity;
+package com.mygo.dto;
 
 import com.mygo.enumeration.ScheduleStatus;
 import com.mygo.enumeration.TimeStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
 @Data
-public class TimeSlot {
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+public class TimeSlotDTO {
 
-    private Integer id;
+    private String id;
 
     private LocalTime startTime;
 

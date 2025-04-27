@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.entity.Admin;
 import com.mygo.entity.User;
+import com.mygo.enumeration.MessageType;
 import com.mygo.enumeration.UserStatus;
 import com.mygo.mapper.AdminMapper;
 import com.mygo.mapper.ChatMapper;
@@ -62,8 +63,7 @@ public class MybatisTes {
 
     @Test
     void SqlExceptionTest6() throws JsonProcessingException {
-        UserStatus userStatus = chatMapper.getUserStatus(340);
-        System.out.println(userStatus);
+        chatMapper.addMessage(1, "nihao", MessageType.TEXT, "user");
 
     }
 
