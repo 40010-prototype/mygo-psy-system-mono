@@ -59,8 +59,7 @@ public class ChatServiceImpl implements ChatService {
         Integer messageId;
         if (isFromUser) {
             messageId = chatMapper.getMessageId(toId, fromId);
-        }
-        else {
+        } else {
             messageId = chatMapper.getMessageId(fromId, toId);
         }
         return messageId;
@@ -77,8 +76,7 @@ public class ChatServiceImpl implements ChatService {
         Integer consultId;
         if (isFromUser) {
             consultId = chatMapper.getConsultId(toId, fromId);
-        }
-        else {
+        } else {
             consultId = chatMapper.getConsultId(fromId, toId);
         }
         return consultId;

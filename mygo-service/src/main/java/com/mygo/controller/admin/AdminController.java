@@ -8,6 +8,7 @@ import com.mygo.result.Result;
 import com.mygo.service.AdminService;
 import com.mygo.vo.AdminInfoVO;
 import com.mygo.vo.AdminLoginVO;
+import com.mygo.vo.AdminMessageVO;
 import com.mygo.vo.AdminSessionVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -75,8 +76,16 @@ public class AdminController {
     }
 
     @GetMapping("/sessions/{sessionId}/messages")
-    public Result<Void> getMessages(@PathVariable Integer sessionId, @RequestParam("limit") Integer limit,
-                                    @RequestParam("offset") Integer offset) {
+    public Result<List<AdminMessageVO>> getMessages(@PathVariable Integer sessionId,
+                                                    @RequestParam("limit") Integer limit,
+                                                    @RequestParam("offset") Integer offset) throws JsonProcessingException {
+        List<AdminMessageVO> messages = adminService.getMessages(sessionId, limit, offset);
+        return Result.success(messages);
+    }
+
+    @PatchMapping("/sessions/{sessionId}/read")
+    public Result<Void> read(@PathVariable Integer sessionId) {
+        adminService.read(sessionId);
         return Result.success();
     }
 

@@ -58,7 +58,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
         //4.把用户信息保存在Context中
         Context.saveId(id);
-        log.info("id成功保存在context"+id);
+        log.info("id成功保存在context" + id);
         //5.刷新redis中该用户的有效时间
         stringRedisTemplate.expire(
                 RedisConstant.JWT_KEY + id, RedisConstant.JWT_EXPIRE, RedisConstant.JWT_EXPIRE_UNIT);

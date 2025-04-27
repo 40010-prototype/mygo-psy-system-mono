@@ -1,14 +1,13 @@
 package com.mygo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mygo.dto.AdminAddScheduleDTO;
 import com.mygo.dto.AdminLoginDTO;
 import com.mygo.dto.AdminRegisterDTO;
 import com.mygo.dto.ResetPasswordDTO;
-import com.mygo.vo.AdminMessageVO;
-import com.mygo.vo.AdminInfoVO;
-import com.mygo.vo.AdminLoginVO;
-import com.mygo.vo.AdminSessionVO;
+import com.mygo.vo.*;
 
+import java.util.Date;
 import java.util.List;
 
 public interface AdminService {
@@ -27,4 +26,20 @@ public interface AdminService {
 
     List<AdminMessageVO> getMessages(Integer sessionId, Integer limit, Integer offset) throws JsonProcessingException;
 
+    void read(Integer sessionId);
+
+    void addSchedule(AdminAddScheduleDTO adminAddScheduleDTO);
+
+    void approveScheduleByDay(Integer scheduleId);
+
+    void approveScheduleByTimeSlot(Integer timeSlotId);
+
+    AdminScheduleVO getScheduleByCounselor(Date startDate, Date endDate);
+
+    List<AdminScheduleVO> getScheduleBySupervisor(Date startDate, Date endDate);
+
+    List<AdminScheduleVO> getScheduleByManager(Date startDate, Date endDate);
+
 }
+
+

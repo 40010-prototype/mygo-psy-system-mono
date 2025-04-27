@@ -2,13 +2,13 @@ package com.mygo.enumeration;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum TimeStatus implements ValueEnum {
-    AVAILABLE("available"),
-    BUSY("busy");
+public enum ScheduleStatus implements ValueEnum {
+    APPROVED("approved"),
+    PENDING("pending");
 
     private final String value;
 
-    TimeStatus(String value) {
+    ScheduleStatus(String value) {
         this.value = value;
     }
 

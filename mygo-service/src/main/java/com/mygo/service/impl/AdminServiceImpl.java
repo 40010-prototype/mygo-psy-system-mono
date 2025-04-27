@@ -6,10 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.constant.ErrorMessage;
 import com.mygo.constant.RedisConstant;
-import com.mygo.dto.AdminLoginDTO;
-import com.mygo.dto.AdminRegisterDTO;
-import com.mygo.dto.LastMessageAndTime;
-import com.mygo.dto.ResetPasswordDTO;
+import com.mygo.dto.*;
 import com.mygo.entity.*;
 import com.mygo.enumeration.Sender;
 import com.mygo.exception.BadRequestException;
@@ -18,16 +15,14 @@ import com.mygo.mapper.ChatMapper;
 import com.mygo.mapper.UserMapper;
 import com.mygo.service.AdminService;
 import com.mygo.utils.*;
-import com.mygo.vo.AdminMessageVO;
-import com.mygo.vo.AdminInfoVO;
-import com.mygo.vo.AdminLoginVO;
-import com.mygo.vo.AdminSessionVO;
+import com.mygo.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -187,7 +182,7 @@ public class AdminServiceImpl implements AdminService {
             User user = userMapper.selectUserById(consult.getUserId());
             adminSessionVO.setClientAvatar(user.getAvatar());
             adminSessionVO.setClientName(user.getName()
-                    ==null ? user.getEmail() : user.getName());
+                    == null ? user.getEmail() : user.getName());
             adminSessionVO.setStatus(user.getStatus());
             Admin admin = adminMapper.getAdminById(id);
             adminSessionVO.setCounselorAvatar(admin.getAvatar());
@@ -207,10 +202,11 @@ public class AdminServiceImpl implements AdminService {
         for (Message message : messages) {
             AdminMessageVO messageVO = AdminMessageVO.builder()
                     .sessionId(sessionId.toString())
-                    .type(message.getMessageType())
-                    .meta(objectMapper.readValue(message.getMeta(), new TypeReference<>() {
-                    }))
                     .content(message.getMessage())
+                    .type(message.getMessageType())
+                    .meta(message.getMeta() ==
+                            null ? null : objectMapper.readValue(message.getMeta(), new TypeReference<>() {
+                    }))
                     .timestamp(message.getTime())
                     .status(message.getStatus())
                     .id(message.getId()
@@ -233,6 +229,104 @@ public class AdminServiceImpl implements AdminService {
         return messageVOs;
     }
 
+    @Override
+    public void read(Integer sessionId) {
+        adminMapper.setRead(sessionId);
+    }
 
+    @Override
+    public void addSchedule(AdminAddScheduleDTO adminAddScheduleDTO) {
+        Integer adminId = Context.getId();
+        List<Schedule> schedules = adminAddScheduleDTO.getSchedules();
+        for (Schedule schedule : schedules) {
+            Date date = schedule.getDate();
+            List<StartAndEndTime> periods = adminMapper.getTimePeriodByDateAndAdminId(date, adminId);
+            if (periods == null || periods.isEmpty()) {
+                adminMapper.addScheduleStatus(date, adminId);
+            }
+            List<TimeSlotDTO> timeSlots = schedule.getTimeSlots();
+            for (TimeSlotDTO timeSlot : timeSlots) {
+                StartAndEndTime insertPeriod = new StartAndEndTime(timeSlot.getStartTime(), timeSlot.getEndTime());
+                if (periods != null) {
+                    for (StartAndEndTime startAndEndTime : periods) {
+                        if (insertPeriod.conflict(startAndEndTime))
+                            throw new BadRequestException(ErrorMessage.TIME_CONFLICT);
+
+                    }
+                }
+                adminMapper.addSchedule(adminId, date, timeSlot.getStartTime(), timeSlot.getEndTime(),
+                        timeSlot.getStatus());
+            }
+        }
+    }
+
+    @Override
+    public void approveScheduleByDay(Integer scheduleId) {
+        adminMapper.approveScheduleByDay(scheduleId);
+    }
+
+    @Override
+    public void approveScheduleByTimeSlot(Integer timeSlotId) {
+        adminMapper.approveScheduleByTimeSlot(timeSlotId);
+    }
+
+    @Override
+    public AdminScheduleVO getScheduleByCounselor(Date startDate, Date endDate) {
+        Integer adminId = Context.getId();
+        return getScheduleByCounselorAux(startDate, endDate, adminId);
+
+    }
+
+    private AdminScheduleVO getScheduleByCounselorAux(Date startDate, Date endDate, Integer adminId) {
+        String adminName = adminMapper.getAdminById(adminId)
+                .getAccountName();
+        AdminScheduleVO adminScheduleVO = new AdminScheduleVO();
+        adminScheduleVO.setCounselorName(adminName);
+        adminScheduleVO.setId(adminId.toString());
+        List<ScheduleAndStatusDTO> schedules = new ArrayList<>();
+        List<DateAndStatusDTO> dateAndStatusDTOS = adminMapper.getDateAndStatusBetween(startDate, endDate, adminId);
+        for (DateAndStatusDTO dateAndStatus : dateAndStatusDTOS) {
+            ScheduleAndStatusDTO scheduleAndStatusDTO = new ScheduleAndStatusDTO();
+            scheduleAndStatusDTO.setDate(dateAndStatus.getDate());
+            scheduleAndStatusDTO.setStatus(dateAndStatus.getStatus());
+            List<TimeSlotDTO> timeSlotVOs = new ArrayList<>();
+            List<TimeSlot> timeSlots = adminMapper.getTimeSlotByDateAndAdminId(dateAndStatus.getDate(), adminId);
+            for (TimeSlot timeSlot : timeSlots) {
+                TimeSlotDTO timeSlotVO = TimeSlotDTO.builder()
+                        .startTime(timeSlot.getStartTime())
+                        .endTime(timeSlot.getEndTime())
+                        .status(timeSlot.getStatus())
+                        .id(timeSlot.toString())
+                        .build();
+                timeSlotVOs.add(timeSlotVO);
+            }
+            scheduleAndStatusDTO.setTimeSlots(timeSlotVOs);
+            schedules.add(scheduleAndStatusDTO);
+        }
+        adminScheduleVO.setSchedules(schedules);
+        adminScheduleVO.setOverallStatus(adminMapper.getCounselorStatusById(adminId));
+        return adminScheduleVO;
+    }
+
+    @Override
+    public List<AdminScheduleVO> getScheduleBySupervisor(Date startDate, Date endDate) {
+        Integer supervisorId = Context.getId();
+        List<Integer> counselorIds=adminMapper.getCounselorBySupervisor(supervisorId);
+        List<AdminScheduleVO> adminScheduleVOS = new ArrayList<>();
+        for (Integer counselorId : counselorIds) {
+            adminScheduleVOS.add(getScheduleByCounselorAux(startDate, endDate,counselorId));
+        }
+        return adminScheduleVOS;
+    }
+
+    @Override
+    public List<AdminScheduleVO> getScheduleByManager(Date startDate, Date endDate) {
+        List<Integer> counselorIds=adminMapper.getAllCounselor();
+        List<AdminScheduleVO> adminScheduleVOS = new ArrayList<>();
+        for (Integer counselorId : counselorIds) {
+            adminScheduleVOS.add(getScheduleByCounselorAux(startDate, endDate,counselorId));
+        }
+        return adminScheduleVOS;
+    }
 
 }

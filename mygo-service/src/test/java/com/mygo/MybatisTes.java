@@ -53,14 +53,16 @@ public class MybatisTes {
     void SqlExceptionTest4() throws JsonProcessingException {
         System.out.println(jwtTool.createJWT(5));
     }
+
     @Test
     void SqlExceptionTest5() throws JsonProcessingException {
-        User user=userMapper.selectUserById(1);
+        User user = userMapper.selectUserById(1);
         System.out.println(user.getStatus());
     }
+
     @Test
     void SqlExceptionTest6() throws JsonProcessingException {
-        UserStatus userStatus=chatMapper.getUserStatus(340);
+        UserStatus userStatus = chatMapper.getUserStatus(340);
         System.out.println(userStatus);
 
     }

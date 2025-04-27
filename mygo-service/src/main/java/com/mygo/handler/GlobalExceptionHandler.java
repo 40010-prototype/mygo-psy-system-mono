@@ -57,7 +57,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Result<Void>> handleIllegalArgumentException(IllegalArgumentException e) {
-        log.error("异常原因：{}  ", e.getMessage());
+        log.error("异常：{}，异常原因：{}  ", e.getClass()
+                .getName(), e.getMessage());
         return ResponseEntity.status(HttpServletResponse.SC_BAD_REQUEST)
                 .body(Result.error(e.getMessage()));
     }

@@ -118,11 +118,15 @@ public class WebSocketServer {
                 .receiverId(messageFromToDTO.getToId()
                         .split("_")[0])
                 .senderId(messageFromToDTO.getFromId()
-                        .split("_")[0]).timestamp(messageFromToDTO.getTime())
+                        .split("_")[0])
+                .timestamp(messageFromToDTO.getTime())
                 .build();
-        adminMessageVO.setId(chatService.getMessageId(messageFromToDTO).toString());
-        adminMessageVO.setSessionId(chatService.getConsultId(messageFromToDTO).toString());
-        adminSession.getAsyncRemote().sendText(text);
+        adminMessageVO.setId(chatService.getMessageId(messageFromToDTO)
+                .toString());
+        adminMessageVO.setSessionId(chatService.getConsultId(messageFromToDTO)
+                .toString());
+        adminSession.getAsyncRemote()
+                .sendText(text);
     }
 
 }
