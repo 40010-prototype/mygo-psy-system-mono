@@ -16,6 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, args = "--mpw.key=fqOS7bGCn3sxsTIL")
 public class MybatisTes {
 
@@ -57,13 +62,20 @@ public class MybatisTes {
 
     @Test
     void SqlExceptionTest5() throws JsonProcessingException {
-        User user = userMapper.selectUserById(1);
-        System.out.println(user.getStatus());
+        adminMapper.getCounselorStatusById(396);
     }
 
     @Test
     void SqlExceptionTest6() throws JsonProcessingException {
-        chatMapper.addMessage(1, "nihao", MessageType.TEXT, "user");
+        LocalDate currentDate = LocalDate.now();  // 当前日期：YYYY-MM-DD
+        System.out.println(new Date());
+        // 将 LocalDate 转换为 java.util.Date，且时间为 00:00:00
+        Date date = Date.from(currentDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        System.out.println(date);
+// 获取当前时间（精确到 HH:mm:ss，去除毫秒）
+        LocalTime currentTime = LocalTime.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS);  // 去除毫秒部分
+
+// 转换成 java.sql.Date
 
     }
 

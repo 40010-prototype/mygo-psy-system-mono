@@ -4,13 +4,14 @@ import com.mygo.dto.TimeSlotDTO;
 import com.mygo.enumeration.ScheduleStatus;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
 @Data
 public class Schedule {
 
-    private Date date;
+    private LocalDate date;
 
     private List<TimeSlotDTO> timeSlots;
 

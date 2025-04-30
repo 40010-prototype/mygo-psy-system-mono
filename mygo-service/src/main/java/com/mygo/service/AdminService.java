@@ -1,10 +1,7 @@
 package com.mygo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mygo.dto.AdminAddScheduleDTO;
-import com.mygo.dto.AdminLoginDTO;
-import com.mygo.dto.AdminRegisterDTO;
-import com.mygo.dto.ResetPasswordDTO;
+import com.mygo.dto.*;
 import com.mygo.vo.*;
 
 import java.util.Date;
@@ -41,6 +38,12 @@ public interface AdminService {
     List<AdminScheduleVO> getScheduleByManager(Date startDate, Date endDate);
 
     List<AdminScheduleVO> getPendingScheduleBySupervisor(Date startDate, Date endDate);
+
+    List<SelectCounselorVO> getAddCounselor();
+
+    HelpVO getHelpSessionId();
+
+    void setHelp(Integer counselorId);
 
 }
 

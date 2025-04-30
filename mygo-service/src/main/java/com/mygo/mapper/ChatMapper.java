@@ -7,6 +7,7 @@ import com.mygo.enumeration.MessageStatus;
 import com.mygo.enumeration.MessageType;
 import com.mygo.enumeration.UserStatus;
 import com.mygo.handler.EnumTypeHandler;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -39,5 +40,14 @@ public interface ChatMapper {
     @Select("select status from user where user_id=#{userId}")
     @Result(property = "status", column = "status", javaType = UserStatus.class, typeHandler = EnumTypeHandler.class)
     UserStatus getUserStatus(Integer userId);
+
+    @Insert("insert into consult_record(user_id,admin_id) value(#{userId},#{counselorId})")
+    void addConsult(Integer userId, Integer counselorId);
+
+    @Select("select consult_id from consult_record where user_id=#{userId} and admin_id=#{counselorId}")
+    Integer getConsult(Integer userId, Integer counselorId);
+
+    @Select("select admin_id from admin where admin_id=#{toId}")
+    Integer getRole(Integer toId);
 
 }

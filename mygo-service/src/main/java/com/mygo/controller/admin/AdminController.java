@@ -4,18 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.dto.AdminLoginDTO;
 import com.mygo.dto.AdminRegisterDTO;
 import com.mygo.dto.ResetPasswordDTO;
+import com.mygo.dto.SelectCounselorDTO;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
-import com.mygo.vo.AdminInfoVO;
-import com.mygo.vo.AdminLoginVO;
-import com.mygo.vo.AdminMessageVO;
-import com.mygo.vo.AdminSessionVO;
+import com.mygo.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -85,7 +84,27 @@ public class AdminController {
 
     @PatchMapping("/sessions/{sessionId}/read")
     public Result<Void> read(@PathVariable Integer sessionId) {
+        log.info("ceshi1");
         adminService.read(sessionId);
+        return Result.success();
+    }
+
+    @GetMapping("*")
+    public Result<List<SelectCounselorVO>> getAllCounselor() {
+        List<SelectCounselorVO> addCounselor = adminService.getAddCounselor();
+
+        return Result.success();
+    }
+
+    @GetMapping("*")
+    public Result<HelpVO> getHelpSessionId(){
+        HelpVO helpSessionId = adminService.getHelpSessionId();
+        return Result.success(helpSessionId);
+    }
+
+    @PostMapping()
+    public Result<Void> setHelp(Integer counselorId){
+        adminService.setHelp(counselorId);
         return Result.success();
     }
 

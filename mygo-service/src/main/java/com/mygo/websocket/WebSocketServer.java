@@ -4,12 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.mygo.config.WebSocketConfig;
+//import com.mygo.config.WebSocketConfig;
+import com.mygo.dto.AdminMessageDTO;
 import com.mygo.dto.MessageDTO;
 import com.mygo.dto.MessageFromToDTO;
 import com.mygo.enumeration.MessageStatus;
+import com.mygo.mapper.ChatMapper;
 import com.mygo.service.ChatService;
 import com.mygo.utils.Context;
+import com.mygo.utils.JwtTool;
 import com.mygo.vo.AdminMessageVO;
 import com.mygo.vo.UserMessageVO;
 import jakarta.websocket.*;
@@ -27,8 +30,8 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-//@ServerEndpoint("/chat/{device}")
-@ServerEndpoint(value = "/ws/{device}", configurator = WebSocketConfig.class)
+@ServerEndpoint("/ws/{device}/{token}")
+//@ServerEndpoint(value = "/ws/{device}", configurator = WebSocketConfig.class)
 public class WebSocketServer {
 
     //建立一个双向哈希表
@@ -51,16 +54,23 @@ public class WebSocketServer {
 
     private static ChatService chatService;
 
+    private static JwtTool jwtTool;
+
+    private ChatMapper chatMapper;
+
     @Autowired
-    public void setWebSocketServer(ChatService chatService) {
+    public void setWebSocketServer(ChatService chatService,JwtTool jwtTool) {
         WebSocketServer.chatService = chatService;
+        WebSocketServer.jwtTool = jwtTool;
     }
 
     @OnOpen
-    public void onOpen(Session session, @PathParam("device") String device) throws IOException {
+    public void onOpen(Session session, @PathParam("device") String device,@PathParam("token")String token) throws IOException {
         //将请求头中的用户id和请求路径中的管理端/用户端标识拼接，并和Session一起存入双向哈希表中
         if (!Objects.equals(device, "admin") && !Objects.equals(device, "user")) session.close();
-        Integer id = Context.getId();
+        System.out.println(token);
+        Integer id=jwtTool.parseJWT(token);
+        System.out.println(id);
         String key = device + "_" + id;
         idToSessionMap.put(key, session);
         sessionToIdMap.put(session, key);
@@ -69,6 +79,7 @@ public class WebSocketServer {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
+        log.error("zhe"+throwable.getMessage());
     }
 
     @OnClose
@@ -90,11 +101,34 @@ public class WebSocketServer {
          * 1)让前端把发送者、接受者、发送方向一起传过来。（要传就干脆一起传过来）
          * 2)每次都根据接受者id查一下哈希表。这样要查两次，分别是admin_{id)和user_{id},但因为查询本来就是平均O(1)的，也不会很麻烦。
          */
-        log.info(jsonMessage);
-        MessageDTO messageDTO = objectMapper.readValue(jsonMessage, MessageDTO.class);
-        log.info(messageDTO.toString());
+
         String key = sessionToIdMap.get(session);
-        String toDevice = Objects.equals(key.split("_")[0], "admin") ? "user" : "admin";
+        String fromDevice = Objects.equals(key.split("_")[0], "user") ? "user" : "admin";
+        log.info(jsonMessage);
+        MessageDTO messageDTO ;
+        if(fromDevice.equals("user")) {
+            //如果是移动端发送的数据
+            messageDTO=objectMapper.readValue(jsonMessage, MessageDTO.class);
+            log.info(messageDTO.toString());
+        }
+        else {
+            AdminMessageDTO adminMessageDTO = objectMapper.readValue(jsonMessage, AdminMessageDTO.class);
+            messageDTO=new MessageDTO();
+            messageDTO.setMessage(adminMessageDTO.getContent());
+            messageDTO.setMessageType(adminMessageDTO.getType());
+            messageDTO.setMeta(adminMessageDTO.getMeta());
+            messageDTO.setToId(Integer.valueOf(adminMessageDTO.getReceiverId()));
+        }
+        Integer toId= messageDTO.getToId();
+        Integer toRole = chatMapper.getRole(toId);
+        String toDevice;
+        if(toRole==null){
+            //是咨询师和用户的聊天
+            toDevice="user";
+        }
+        else{
+            toDevice="admin";
+        }
         MessageFromToDTO messageFromToDTO = new MessageFromToDTO(key, toDevice +"_"+
                 messageDTO.getToId(), messageDTO.getMessageType(), messageDTO.getMessage(), messageDTO.getMeta(),
                 LocalDateTime.now());
@@ -109,50 +143,95 @@ public class WebSocketServer {
     //双发消息
     public void sendMessage(MessageFromToDTO messageFromToDTO) throws JsonProcessingException {
         log.info("开始转发消息");
-        boolean isToUser = messageFromToDTO.getToId()
-                .split("_")[0].equals("user");
-        Session userSession;
-        Session adminSession;
-        log.info("isToUser: " + isToUser);
-        if (isToUser) {
-            userSession = idToSessionMap.get(messageFromToDTO.getToId());
-            adminSession = idToSessionMap.get(messageFromToDTO.getFromId());
+        log.info(messageFromToDTO.toString());
+        boolean toIsUser = Objects.equals(messageFromToDTO.getToId(), "user");
+        boolean fromIdUser = Objects.equals(messageFromToDTO.getFromId(), "user");
+        if (toIsUser||fromIdUser) {
+            Session userSession;
+            Session adminSession;
+            if (toIsUser) {
+                userSession = idToSessionMap.get(messageFromToDTO.getToId());
+                adminSession = idToSessionMap.get(messageFromToDTO.getFromId());
+            }
+            else {
+                adminSession = idToSessionMap.get(messageFromToDTO.getToId());
+                userSession = idToSessionMap.get(messageFromToDTO.getFromId());
+            }
+            //处理移动端逻辑
+            if(userSession!=null){
+                UserMessageVO userMessageVo = new UserMessageVO(Integer.valueOf(messageFromToDTO.getFromId()
+                        .split("_")[1]), Integer.valueOf(messageFromToDTO.getToId()
+                        .split("_")[1]), messageFromToDTO.getMessageType(), messageFromToDTO.getMessage(),
+                        messageFromToDTO.getMeta(), messageFromToDTO.getTime());
+                log.info("userMessageVo: " + userMessageVo.toString());
+                String text = objectMapper.writeValueAsString(userMessageVo);
+
+                log.info("移动端消息："+text);
+                userSession.getAsyncRemote()
+                        .sendText(text);
+            }
+            //处理网页端逻辑
+            if(adminSession!=null){
+                AdminMessageVO adminMessageVO = AdminMessageVO.builder()
+                        .content(messageFromToDTO.getMessage())
+                        .meta(messageFromToDTO.getMeta())
+                        .type(messageFromToDTO.getMessageType())
+                        .status(MessageStatus.READ)
+                        .receiverId(messageFromToDTO.getToId()
+                                .split("_")[1])
+                        .senderId(messageFromToDTO.getFromId()
+                                .split("_")[1])
+                        .timestamp(messageFromToDTO.getTime())
+                        .build();
+                adminMessageVO.setId(chatService.getMessageId(messageFromToDTO)
+                        .toString());
+                adminMessageVO.setSessionId(chatService.getConsultId(messageFromToDTO)
+                        .toString());
+                adminSession.getAsyncRemote()
+                        .sendText(objectMapper.writeValueAsString(adminMessageVO));
+            }
+
+
+
         } else {
-            adminSession = idToSessionMap.get(messageFromToDTO.getToId());
-            userSession = idToSessionMap.get(messageFromToDTO.getFromId());
+            Session adminToSession=idToSessionMap.get(messageFromToDTO.getToId());
+            Session adminFromSession=idToSessionMap.get(messageFromToDTO.getFromId());
+            //to逻辑
+
+            AdminMessageVO adminMessageVO = AdminMessageVO.builder()
+                    .content(messageFromToDTO.getMessage())
+                    .meta(messageFromToDTO.getMeta())
+                    .type(messageFromToDTO.getMessageType())
+                    .status(MessageStatus.READ)
+                    .receiverId(messageFromToDTO.getToId()
+                            .split("_")[1])
+                    .senderId(messageFromToDTO.getFromId()
+                            .split("_")[1])
+                    .timestamp(messageFromToDTO.getTime())
+                    .build();
+            adminMessageVO.setId(chatService.getMessageId(messageFromToDTO)
+                    .toString());
+            adminMessageVO.setSessionId(chatService.getConsultId(messageFromToDTO)
+                    .toString());
+            if(adminToSession!=null){
+                adminToSession.getAsyncRemote()
+                        .sendText(objectMapper.writeValueAsString(adminMessageVO));
+            }
+
+            //from逻辑
+            if(adminFromSession!=null){
+                adminFromSession.getAsyncRemote()
+                        .sendText(objectMapper.writeValueAsString(adminMessageVO));
+            }
+
         }
 
-        if (userSession == null || adminSession == null) return;
-        log.info("adminSession: " + adminSession.getId());
-        //处理移动端逻辑
-        UserMessageVO userMessageVo = new UserMessageVO(Integer.valueOf(messageFromToDTO.getFromId()
-                .split("_")[1]), Integer.valueOf(messageFromToDTO.getToId()
-                .split("_")[1]), messageFromToDTO.getMessageType(), messageFromToDTO.getMessage(),
-                messageFromToDTO.getMeta(), messageFromToDTO.getTime());
-        log.info("userMessageVo: " + userMessageVo.toString());
-        String text = objectMapper.writeValueAsString(userMessageVo);
 
-        log.info("移动端消息："+text);
-        userSession.getAsyncRemote()
-                .sendText(text);
-        //处理网页端逻辑
-        AdminMessageVO adminMessageVO = AdminMessageVO.builder()
-                .content(messageFromToDTO.getMessage())
-                .meta(messageFromToDTO.getMeta())
-                .type(messageFromToDTO.getMessageType())
-                .status(MessageStatus.READ)
-                .receiverId(messageFromToDTO.getToId()
-                        .split("_")[1])
-                .senderId(messageFromToDTO.getFromId()
-                        .split("_")[1])
-                .timestamp(messageFromToDTO.getTime())
-                .build();
-        adminMessageVO.setId(chatService.getMessageId(messageFromToDTO)
-                .toString());
-        adminMessageVO.setSessionId(chatService.getConsultId(messageFromToDTO)
-                .toString());
-        adminSession.getAsyncRemote()
-                .sendText(objectMapper.writeValueAsString(adminMessageVO));
+    }
+
+    @Autowired
+    public void setChatMapper(ChatMapper chatMapper) {
+        this.chatMapper = chatMapper;
     }
 
 }

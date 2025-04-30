@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -189,8 +190,10 @@ public class AdminServiceImpl implements AdminService {
             adminSessionVO.setCounselorAvatar(admin.getAvatar());
             adminSessionVO.setCounselorName(admin.getAccountName());
             LastMessageAndTime lastMessageAndTime = chatMapper.getLastMessage(consult.getConsultId());
-            adminSessionVO.setLastMessage(lastMessageAndTime.getMessage());
-            adminSessionVO.setLastMessageTime(lastMessageAndTime.getTime());
+            if(lastMessageAndTime!=null){
+                adminSessionVO.setLastMessage(lastMessageAndTime.getMessage());
+                adminSessionVO.setLastMessageTime(lastMessageAndTime.getTime());
+            }
             sessions.add(adminSessionVO);
         }
         return sessions;
@@ -238,10 +241,18 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void addSchedule(AdminAddScheduleDTO adminAddScheduleDTO) {
         Integer adminId = Context.getId();
+        Integer exist=adminMapper.getCounselorStatus(adminId);
+        if(exist==null){
+            adminMapper.addCounselorStatus(adminId,adminAddScheduleDTO.getOverallStatus());
+        }
+        else{
+            adminMapper.changeCounselorStatus(adminId,adminAddScheduleDTO.getOverallStatus());
+        }
         List<Schedule> schedules = adminAddScheduleDTO.getSchedules();
         for (Schedule schedule : schedules) {
-            Date date = schedule.getDate();
+            LocalDate date = schedule.getDate();
             List<StartAndEndTime> periods = adminMapper.getTimePeriodByDateAndAdminId(date, adminId);
+            System.out.println(periods);
             if (periods == null || periods.isEmpty()) {
                 adminMapper.addScheduleStatus(date, adminId);
             }
@@ -280,6 +291,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private AdminScheduleVO getScheduleByCounselorAux(Date startDate, Date endDate, Integer adminId) {
+        System.out.println("这里的id"+adminId);
         String adminName = adminMapper.getAdminById(adminId)
                 .getAccountName();
         AdminScheduleVO adminScheduleVO = new AdminScheduleVO();
@@ -292,7 +304,8 @@ public class AdminServiceImpl implements AdminService {
             AddScheduleList(adminId, schedules, dateAndStatus);
         }
         adminScheduleVO.setSchedules(schedules);
-        adminScheduleVO.setOverallStatus(adminMapper.getCounselorStatusById(adminId));
+        ScheduleStatusDTO counselorStatusById = adminMapper.getCounselorStatusById(adminId);
+        adminScheduleVO.setOverallStatus(counselorStatusById==null?null:counselorStatusById.getScheduleStatus());
         return adminScheduleVO;
     }
 
@@ -357,7 +370,7 @@ public class AdminServiceImpl implements AdminService {
 
         }
         adminScheduleVO.setSchedules(schedules);
-        adminScheduleVO.setOverallStatus(adminMapper.getCounselorStatusById(adminId));
+        adminScheduleVO.setOverallStatus(adminMapper.getCounselorStatusById(adminId).getScheduleStatus());
         return adminScheduleVO;
     }
 
@@ -374,7 +387,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<AdminScheduleVO> getScheduleByManager(Date startDate, Date endDate) {
-        List<Integer> counselorIds=adminMapper.getAllCounselor();
+        List<Integer> counselorIds=adminMapper.getAllCounselorId();
         List<AdminScheduleVO> adminScheduleVOS = new ArrayList<>();
         for (Integer counselorId : counselorIds) {
             adminScheduleVOS.add(getScheduleByCounselorAux(startDate, endDate,counselorId));
@@ -391,6 +404,44 @@ public class AdminServiceImpl implements AdminService {
             adminScheduleVOS.add(getPendingScheduleByCounselorAux(startDate, endDate,counselorId));
         }
         return adminScheduleVOS;
+    }
+
+    @Override
+    public List<SelectCounselorVO> getAddCounselor() {
+        List<SelectCounselorDTO> allCounselor = adminMapper.getAllCounselor();
+        List<SelectCounselorVO> vo=new ArrayList<SelectCounselorVO>();
+        for (SelectCounselorDTO selectCounselorVO : allCounselor) {
+            SelectCounselorVO selectCounselorVO1 = new SelectCounselorVO();
+            selectCounselorVO1.setId(selectCounselorVO.getAdminId().toString());
+            selectCounselorVO1.setName(selectCounselorVO.getAccountName());
+            selectCounselorVO1.setAvatar(selectCounselorVO.getAvatar());
+            vo.add(selectCounselorVO1);
+        }
+        return vo;
+    }
+
+    @Override
+    public HelpVO getHelpSessionId() {
+        HelpVO helpVO = new HelpVO();
+        Integer id = Context.getId();
+        Integer supervisorId=adminMapper.getSupervisorIdByCounselor(id);
+        Integer consultId = chatMapper.getConsultId(id, supervisorId);
+        helpVO.setSessionId(consultId.toString());
+        helpVO.setSupervisorId(supervisorId.toString());
+        Admin admin=adminMapper.getAdminById(supervisorId);
+        helpVO.setName(admin.getAccountName());
+        helpVO.setAvatar(admin.getAvatar());
+        return helpVO;
+
+    }
+
+    @Override
+    public void setHelp(Integer counselorId) {
+        Integer supervisorId = Context.getId();
+        //1.建立帮助
+        adminMapper.setManage(supervisorId,counselorId);
+        //2.建立会话
+        chatMapper.addConsult(supervisorId,counselorId);
     }
 
 }

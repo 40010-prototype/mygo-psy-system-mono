@@ -1,6 +1,8 @@
 package com.mygo.mapper;
 
 import com.mygo.dto.DateAndStatusDTO;
+import com.mygo.dto.ScheduleStatusDTO;
+import com.mygo.dto.SelectCounselorDTO;
 import com.mygo.dto.StartAndEndTime;
 import com.mygo.entity.Admin;
 import com.mygo.entity.Consult;
@@ -10,6 +12,7 @@ import com.mygo.enumeration.*;
 import com.mygo.handler.EnumTypeHandler;
 import org.apache.ibatis.annotations.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
@@ -45,7 +48,7 @@ public interface AdminMapper {
     })
     List<Consult> getConsultInfoByAdminId(Integer adminId);
 
-    @Select("select * from message where consult_id=#{sessionId} order by time desc  ")
+    @Select("select * from message where consult_id=#{sessionId} order by time asc  ")
     @Results({
             @Result(property = "status", column = "status", javaType = MessageStatus.class, typeHandler =
                     EnumTypeHandler.class),
@@ -61,14 +64,14 @@ public interface AdminMapper {
     void setRead(Integer id);
 
     @Select("select start_time,end_time from schedule where date=#{date} and admin_id=#{adminId}")
-    List<StartAndEndTime> getTimePeriodByDateAndAdminId(Date date, Integer adminId);
+    List<StartAndEndTime> getTimePeriodByDateAndAdminId(LocalDate date, Integer adminId);
 
     @Insert("insert into schedule(admin_id,date,start_time,end_time,status) value (#{adminId},#{date},#{startTime}," +
             "#{endTime},#{status})")
-    void addSchedule(Integer adminId, Date date, LocalTime startTime, LocalTime endTime, TimeStatus status);
+    void addSchedule(Integer adminId, LocalDate date, LocalTime startTime, LocalTime endTime, TimeStatus status);
 
     @Insert("insert into date_status(admin_id,date) value(#{adminId},#{date})")
-    void addScheduleStatus(Date date, Integer adminId);
+    void addScheduleStatus(LocalDate date, Integer adminId);
 
     @Update("update date_status set approval_status='approved' where id=#{scheduleId}")
     void approveScheduleByDay(Integer scheduleId);
@@ -96,11 +99,36 @@ public interface AdminMapper {
     @Select("select counselor_id from manage where supervisor_id=#{supervisorId}")
     List<Integer> getCounselorBySupervisor(Integer supervisorId);
 
+    @Select("select supervisor_id from manage where counselor_id=#{counselorId}")
+    Integer getSupervisorIdByCounselor(Integer counselorId);
+
     @Select("select overall_status from counselor_status where id=#{adminId}")
-    @Result(column = "overall_status",javaType = ScheduleStatus.class,typeHandler=EnumTypeHandler.class)
-    ScheduleStatus getCounselorStatusById(Integer adminId);
+    @Result(property = "scheduleStatus", column = "overall_status",javaType = ScheduleStatus.class,typeHandler=EnumTypeHandler.class)
+    ScheduleStatusDTO getCounselorStatusById(Integer adminId);
 
     @Select("select admin_id from admin where role='counselor'")
-    List<Integer> getAllCounselor();
+    List<Integer> getAllCounselorId();
+
+    @Select("select account_name from admin where admin_id=#{activeCounselorId}")
+    String getNameById(Integer activeCounselorId);
+
+    @Select(("select id from counselor_status where id=#{adminId}"))
+    Integer getCounselorStatus(Integer adminId);
+
+    @Insert("insert into counselor_status(id,overall_status) value(#{adminId},#{overallStatus})")
+    @Result(property = "overallStatus",column = "overall_status",javaType = ScheduleStatus.class,typeHandler = EnumTypeHandler.class)
+    void addCounselorStatus(Integer adminId, ScheduleStatus overallStatus);
+
+    @Update("update counselor_status set overall_status=#{overallStatus} where id=#{adminId}")
+    @Result(property = "overallStatus",column = "overall_status",javaType = ScheduleStatus.class,typeHandler = EnumTypeHandler.class)
+    void changeCounselorStatus(Integer adminId, ScheduleStatus overallStatus);
+
+    @Select("select admin_id,account_name,avator from admin where role='counselor'")
+    List<SelectCounselorDTO> getAllCounselor();
+
+    @Insert("insert into manage value(#{supervisorId},#{counselorId})")
+    void setManage(Integer supervisorId, Integer counselorId);
+
+
 
 }

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TimeStatus implements ValueEnum {
     AVAILABLE("available"),
-    BUSY("busy");
+    BUSY("busy"),
+    UNAVAILABLE("unavailable");
 
     private final String value;
 

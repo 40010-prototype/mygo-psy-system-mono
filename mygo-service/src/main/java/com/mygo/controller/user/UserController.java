@@ -1,18 +1,20 @@
 package com.mygo.controller.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.dto.UserAddInfoDTO;
+import com.mygo.dto.UserDTO;
 import com.mygo.dto.UserLoginDTO;
 import com.mygo.dto.UserRegisterDTO;
 import com.mygo.result.Result;
 import com.mygo.service.UserService;
+import com.mygo.vo.ActiveCounselorVO;
 import com.mygo.vo.UserLoginVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -44,6 +46,18 @@ public class UserController {
     @Operation(summary = "添加信息")
     public Result<Void> addInfo(@RequestBody UserAddInfoDTO userAddInfoDTO) {
         userService.addInfo(userAddInfoDTO);
+        return Result.success();
+    }
+
+    @GetMapping("/getActiveCounselor")
+    public Result<List<ActiveCounselorVO>> getActiveCounselor() {
+        List<ActiveCounselorVO> activeCounselor = userService.getActiveCounselor();
+        return Result.success(activeCounselor);
+    }
+
+    @PostMapping("/setSession/{counselorId}")
+    public Result<Void> setSession(@PathVariable("counselorId") Integer counselorId) throws JsonProcessingException {
+        userService.setSession(counselorId);
         return Result.success();
     }
 
