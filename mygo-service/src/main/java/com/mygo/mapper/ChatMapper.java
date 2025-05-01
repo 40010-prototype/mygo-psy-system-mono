@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.Delete;
 
 public interface ChatMapper {
 
@@ -41,6 +42,9 @@ public interface ChatMapper {
     @Result(property = "status", column = "status", javaType = UserStatus.class, typeHandler = EnumTypeHandler.class)
     UserStatus getUserStatus(Integer userId);
 
+    @Select("select count(*) from consult_record where user_id=#{userId} and admin_id=#{counselorId}")
+    Integer checkConsultExists(Integer userId, Integer counselorId);
+
     @Insert("insert into consult_record(user_id,admin_id) value(#{userId},#{counselorId})")
     void addConsult(Integer userId, Integer counselorId);
 
@@ -49,5 +53,8 @@ public interface ChatMapper {
 
     @Select("select admin_id from admin where admin_id=#{toId}")
     Integer getRole(Integer toId);
+
+    @Delete("delete from consult_record where user_id=#{userId} and admin_id=#{counselorId}")
+    void removeConsult(Integer userId, Integer counselorId);
 
 }

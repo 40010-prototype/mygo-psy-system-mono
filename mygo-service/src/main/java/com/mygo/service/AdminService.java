@@ -46,6 +46,12 @@ public interface AdminService {
 
     void setHelp(Integer counselorId);
 
+    void removeHelp(Integer counselorId);
+
+    void setHelp(Integer supervisorId, Integer counselorId);
+
+    void removeHelp(Integer supervisorId, Integer counselorId);
+
     List<SelectUserVO> getAllUser();
 
     SelectUserVO getAllUserById(Integer userId);

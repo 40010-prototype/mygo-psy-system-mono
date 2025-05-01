@@ -408,7 +408,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<SelectAdminVO> getAllAdminByRole(Role role){
+    public List<SelectAdminVO> getAllAdminByRole(Role role) {
         List<Admin> allCounselor = adminMapper.getAllAdminByRole(role);
         List<SelectAdminVO> vo = new ArrayList<>();
         for (Admin counselor : allCounselor) {
@@ -424,7 +424,9 @@ public class AdminServiceImpl implements AdminService {
                     .role(role)
                     .createdAt(counselor.getCreatedAt().toString())
                     .build();
-        } return vo;
+            vo.add(selectCounselorVO);
+        }
+        return vo;
     }
 
     @Override
@@ -445,10 +447,57 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void setHelp(Integer counselorId) {
         Integer supervisorId = Context.getId();
-        //1.建立帮助
+        setHelp(supervisorId, counselorId);
+    }
+
+    @Override
+    public void removeHelp(Integer counselorId) {
+        Integer supervisorId = Context.getId();
+        removeHelp(supervisorId, counselorId);
+    }
+    
+    @Override
+    public void setHelp(Integer supervisorId, Integer counselorId) {
+        //1.检查关系是否已存在
+        Integer exists = adminMapper.checkManageExists(supervisorId, counselorId);
+        if (exists != null && exists > 0) {
+            log.info("管理关系已经存在，不再重复创建");
+            return;
+        }
+        
+        //2.建立帮助关系
         adminMapper.setManage(supervisorId, counselorId);
-        //2.建立会话
+        
+        //3.检查会话是否已存在
+        Integer consultExists = chatMapper.checkConsultExists(supervisorId, counselorId);
+        if (consultExists != null && consultExists > 0) {
+            log.info("会话已经存在，不再重复创建");
+            return;
+        }
+        
+        //4.建立会话
         chatMapper.addConsult(supervisorId, counselorId);
+    }
+    
+    @Override
+    public void removeHelp(Integer supervisorId, Integer counselorId) {
+        //1.检查关系是否存在
+        Integer exists = adminMapper.checkManageExists(supervisorId, counselorId);
+        if (exists == null || exists == 0) {
+            log.info("管理关系不存在，无需删除");
+        } else {
+            //2.移除管理关系
+            adminMapper.removeManage(supervisorId, counselorId);
+        }
+        
+        //3.检查会话是否存在
+        Integer consultExists = chatMapper.checkConsultExists(supervisorId, counselorId);
+        if (consultExists == null || consultExists == 0) {
+            log.info("会话不存在，无需删除");
+        } else {
+            //4.移除会话
+            chatMapper.removeConsult(supervisorId, counselorId);
+        }
     }
 
     @Override

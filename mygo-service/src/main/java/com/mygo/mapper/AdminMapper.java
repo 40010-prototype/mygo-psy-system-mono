@@ -126,9 +126,12 @@ public interface AdminMapper {
     @Result(property = "role",column = "role",javaType = Role.class,typeHandler = EnumTypeHandler.class)
     List<Admin> getAllAdminByRole(Role role);
 
+    @Select("select count(*) from manage where supervisor_id=#{supervisorId} and admin_id=#{counselorId}")
+    Integer checkManageExists(Integer supervisorId, Integer counselorId);
+
     @Insert("insert into manage value(#{supervisorId},#{counselorId})")
     void setManage(Integer supervisorId, Integer counselorId);
 
-
-
+    @Delete("delete from manage where supervisor_id=#{supervisorId} and admin_id=#{counselorId}")
+    void removeManage(Integer supervisorId, Integer counselorId);
 }

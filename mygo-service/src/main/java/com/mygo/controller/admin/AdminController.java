@@ -120,8 +120,15 @@ public class AdminController {
     }
 
     @PostMapping("/assignments/{supervisorId}/{counselorId}")
-    public Result<Void> setHelp(@PathVariable Integer counselorId,@PathVariable Integer supervisorId) {
-        adminService.setHelp(counselorId);
+    public Result<Void> setHelp(@PathVariable Integer counselorId, @PathVariable Integer supervisorId, 
+                               @RequestParam(defaultValue = "bind") String action) {
+        if ("bind".equals(action)) {
+            adminService.setHelp(supervisorId, counselorId);
+        } else if ("unbind".equals(action)) {
+            adminService.removeHelp(supervisorId, counselorId);
+        } else {
+            return Result.error("不支持的操作");
+        }
         return Result.success();
     }
 
