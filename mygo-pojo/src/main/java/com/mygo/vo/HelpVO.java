@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class HelpVO {
-    String sessionId;
-    String name;
-    String avatar;
+    String supervisorSessionId  ;
+    String supervisorName;
+    String supervisorAvatar;
     String supervisorId;
 
 }

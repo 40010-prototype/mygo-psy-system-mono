@@ -2,7 +2,6 @@ package com.mygo.mapper;
 
 import com.mygo.dto.DateAndStatusDTO;
 import com.mygo.dto.ScheduleStatusDTO;
-import com.mygo.dto.SelectCounselorDTO;
 import com.mygo.dto.StartAndEndTime;
 import com.mygo.entity.Admin;
 import com.mygo.entity.Consult;
@@ -123,8 +122,9 @@ public interface AdminMapper {
     @Result(property = "overallStatus",column = "overall_status",javaType = ScheduleStatus.class,typeHandler = EnumTypeHandler.class)
     void changeCounselorStatus(Integer adminId, ScheduleStatus overallStatus);
 
-    @Select("select admin_id,account_name,avator from admin where role='counselor'")
-    List<SelectCounselorDTO> getAllCounselor();
+    @Select("select * from admin where role=#{role}")
+    @Result(property = "role",column = "role",javaType = Role.class,typeHandler = EnumTypeHandler.class)
+    List<Admin> getAllAdminByRole(Role role);
 
     @Insert("insert into manage value(#{supervisorId},#{counselorId})")
     void setManage(Integer supervisorId, Integer counselorId);

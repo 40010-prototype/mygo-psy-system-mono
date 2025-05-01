@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.dto.AdminLoginDTO;
 import com.mygo.dto.AdminRegisterDTO;
 import com.mygo.dto.ResetPasswordDTO;
-import com.mygo.dto.SelectCounselorDTO;
+import com.mygo.enumeration.Role;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
 import com.mygo.vo.*;
@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -89,21 +88,39 @@ public class AdminController {
         return Result.success();
     }
 
-    @GetMapping("*")
-    public Result<List<SelectCounselorVO>> getAllCounselor() {
-        List<SelectCounselorVO> addCounselor = adminService.getAddCounselor();
-
-        return Result.success();
+    @GetMapping("/users/counselors")
+    public Result<List<SelectAdminVO>> getAllCounselor() {
+        List<SelectAdminVO> addCounselor = adminService.getAllAdminByRole(Role.COUNSELOR);
+        return Result.success(addCounselor);
     }
 
-    @GetMapping("*")
+    @GetMapping("/users/supervisors")
+    public Result<List<SelectAdminVO>> getAllSupervisor() {
+        List<SelectAdminVO> addCounselor = adminService.getAllAdminByRole(Role.SUPERVISOR);
+        return Result.success(addCounselor);
+    }
+
+    @GetMapping("/users")
+    public Result<List<SelectUserVO>> getAllUser() {
+        List<SelectUserVO> allUser = adminService.getAllUser();
+        return Result.success(allUser);
+    }
+
+    @GetMapping("/users/{userId}")
+    public Result<SelectUserVO> getAllUserById(@PathVariable Integer userId) {
+        SelectUserVO user = adminService.getAllUserById(userId);
+        return Result.success(user);
+    }
+
+
+    @GetMapping("/getBindSupervisorInfo")
     public Result<HelpVO> getHelpSessionId(){
         HelpVO helpSessionId = adminService.getHelpSessionId();
         return Result.success(helpSessionId);
     }
 
-    @PostMapping()
-    public Result<Void> setHelp(Integer counselorId){
+    @PostMapping("/assignments/{supervisorId}/{counselorId}")
+    public Result<Void> setHelp(@PathVariable Integer counselorId,@PathVariable Integer supervisorId) {
         adminService.setHelp(counselorId);
         return Result.success();
     }

@@ -2,6 +2,7 @@ package com.mygo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.dto.*;
+import com.mygo.enumeration.Role;
 import com.mygo.vo.*;
 
 import java.util.Date;
@@ -39,11 +40,15 @@ public interface AdminService {
 
     List<AdminScheduleVO> getPendingScheduleBySupervisor(Date startDate, Date endDate);
 
-    List<SelectCounselorVO> getAddCounselor();
+    List<SelectAdminVO> getAllAdminByRole(Role role);
 
     HelpVO getHelpSessionId();
 
     void setHelp(Integer counselorId);
+
+    List<SelectUserVO> getAllUser();
+
+    SelectUserVO getAllUserById(Integer userId);
 
 }
 

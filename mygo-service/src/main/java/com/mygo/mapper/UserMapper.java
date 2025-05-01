@@ -33,4 +33,7 @@ public interface UserMapper {
     @Select("select admin_id from schedule where date=#{date} and #{time} between start_time and end_time")
     List<Integer> getActiveCounselor(Date date, LocalTime time);
 
+    @Select("select * from user")
+    List<User> selectAllUser();
+
 }
