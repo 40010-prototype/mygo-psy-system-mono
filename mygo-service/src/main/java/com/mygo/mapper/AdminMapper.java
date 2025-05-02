@@ -40,12 +40,20 @@ public interface AdminMapper {
     @Update("UPDATE admin SET password=#{password} WHERE name=#{name}")
     void updatePassword(String name, String password);
 
-    @Select("select consult_id,user_id from consult_record where admin_id=#{adminId}")
+    @Select("SELECT c.consult_id, c.participant2_user_id AS user_id, c.status " + // 1. 加上 status
+                    "FROM consult_record c " +
+                    "WHERE c.participant1_admin_id = #{adminId} AND c.participant2_admin_id IS NULL") // 2. 加上类型过滤条件
     @Results({
-            @Result(property = "status", column = "status", javaType = ConsultStatus.class, typeHandler =
-                    EnumTypeHandler.class)
+                    @Result(property = "consultId", column = "consult_id", id = true), // 3. 显式映射 consultId
+                    @Result(property = "participant2UserId", column = "user_id"), // 4. 显式映射 userId (来自别名)
+                    @Result(property = "userId", column = "user_id"), // 5. 显式映射 userId (来自别名)
+                    @Result(property = "status", column = "status", javaType = ConsultStatus.class, // 6. 映射 status
+                                    typeHandler = EnumTypeHandler.class)
     })
     List<Consult> getConsultInfoByAdminId(Integer adminId);
+
+    
+    
 
     @Select("select * from message where consult_id=#{sessionId} order by time asc  ")
     @Results({
@@ -91,14 +99,12 @@ public interface AdminMapper {
             @Result(property = "approvalStatus",column = "approval_status",javaType = ScheduleStatus.class,typeHandler = EnumTypeHandler.class)
 
     })
-
-
     List<TimeSlot> getTimeSlotByDateAndAdminId(Date date, Integer adminId);
 
-    @Select("select counselor_id from manage where supervisor_id=#{supervisorId}")
+    @Select("select admin_id from manage where supervisor_id=#{supervisorId}")
     List<Integer> getCounselorBySupervisor(Integer supervisorId);
 
-    @Select("select supervisor_id from manage where counselor_id=#{counselorId}")
+    @Select("select supervisor_id from manage where admin_id=#{counselorId}")
     Integer getSupervisorIdByCounselor(Integer counselorId);
 
     @Select("select overall_status from counselor_status where id=#{adminId}")
@@ -134,4 +140,10 @@ public interface AdminMapper {
 
     @Delete("delete from manage where supervisor_id=#{supervisorId} and admin_id=#{counselorId}")
     void removeManage(Integer supervisorId, Integer counselorId);
+
+    @Select("select info from admin where admin_id=#{adminId}")
+    String getAdminInfo(Integer adminId);
+
+    @Update("update admin set info=#{info} where admin_id=#{adminId}")
+    void updateAdminInfo(Integer adminId, String info);
 }
