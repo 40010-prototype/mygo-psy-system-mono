@@ -410,40 +410,143 @@ public class AdminServiceImpl implements AdminService {
             }
             sessions.add(adminSessionVO);
         }
+        //3.查询督导-咨询师会话
+        Consult supervisorConsult = adminMapper.getSupervisorConsultInfoByCounselorId(id).get(0);
+        if (supervisorConsult != null) {
+            AdminSessionVO adminSessionVO = AdminSessionVO.builder()
+                    .id(supervisorConsult.getConsultId().toString())
+                    .clientId(id.toString())
+                    .counselorId(supervisorConsult.getAdminId().toString())
+                    .build();
+            Admin user = adminMapper.getAdminById(id);
+            adminSessionVO.setClientAvatar(user.getAvatar());
+            adminSessionVO.setClientName(user.getAccountName());
+            adminSessionVO.setStatus(UserStatus.ACTIVE);
+            Admin admin = adminMapper.getAdminById(supervisorConsult.getAdminId());
+            adminSessionVO.setCounselorAvatar(admin.getAvatar());
+            adminSessionVO.setCounselorName(admin.getAccountName());
+            LastMessageAndTime lastMessageAndTime = chatMapper.getLastMessage(supervisorConsult.getConsultId());
+            if (lastMessageAndTime != null) {
+                adminSessionVO.setLastMessage(lastMessageAndTime.getMessage());
+                adminSessionVO.setLastMessageTime(lastMessageAndTime.getTime());
+            }
+            sessions.add(adminSessionVO);
+        }
+        
         return sessions;
     }
 
     @Override
-    public List<AdminMessageVO> getMessages(Integer sessionId, Integer limit, Integer offset) throws JsonProcessingException {
+    public List<AdminMessageVO> getMessages(Integer sessionId, Integer limit, Integer offset)
+            throws JsonProcessingException {
+        // 1. 直接一次性获取会话信息
+        Consult consult = chatMapper.getConsultById(sessionId);
+
+        Integer participant1AdminId = consult.getParticipant1AdminId();
+        Integer participant2UserId = consult.getParticipant2UserId();
+        Integer participant2AdminId = consult.getParticipant2AdminId();
+
+        boolean isAdminAdminChat = (participant2AdminId != null); // 督导-咨询师类型标记
+        log.debug("会话 SessionId: {}, 类型: {}", sessionId, isAdminAdminChat ? "Admin-Admin" : "Admin-User");
+
+        // 2. 获取历史消息
         List<Message> messages = adminMapper.getHistoryMessageBySessionId(sessionId, limit, offset);
         List<AdminMessageVO> messageVOs = new ArrayList<>();
+
         for (Message message : messages) {
-            AdminMessageVO messageVO = AdminMessageVO.builder()
-                    .sessionId(sessionId.toString())
-                    .content(message.getMessage())
-                    .type(message.getMessageType())
-                    .meta(message.getMeta() ==
-                            null ? null : objectMapper.readValue(message.getMeta(), new TypeReference<>() {
-                    }))
-                    .timestamp(message.getTime())
-                    .status(message.getStatus())
-                    .id(message.getId()
-                            .toString())
-                    .build();
-            Consult consult = chatMapper.getConsultById(sessionId);
-            if (message.getSender() == Sender.Admin) {
-                messageVO.setSenderId(consult.getAdminId()
-                        .toString());
-                messageVO.setReceiverId(consult.getUserId()
-                        .toString());
-            } else if (message.getSender() == Sender.User) {
-                messageVO.setSenderId(consult.getUserId()
-                        .toString());
-                messageVO.setReceiverId(consult.getAdminId()
-                        .toString());
+            // AdminMessageVO messageVO = AdminMessageVO.builder()
+            // .sessionId(sessionId.toString())
+            // .content(message.getMessage())
+            // .type(message.getMessageType())
+            // .meta(message.getMeta() ==
+            // null ? null : objectMapper.readValue(message.getMeta(), new TypeReference<>()
+            // {
+            // }))
+            // .timestamp(message.getTime())
+            // .status(message.getStatus())
+            // .id(message.getId()
+            // .toString())
+            // .build();
+            // if (message.getSender() == Sender.Admin) {
+            // messageVO.setSenderId(consult.getAdminId()
+            // .toString());
+            // messageVO.setReceiverId(consult.getUserId()
+            // .toString());
+            // } else if (message.getSender() == Sender.User) {
+            // messageVO.setSenderId(consult.getUserId()
+            // .toString());
+            // messageVO.setReceiverId(consult.getAdminId()
+            // .toString());
+            // }
+            // messageVOs.add(messageVO);
+            // }
+            // return messageVOs;
+            try {
+                // 构建基础 VO (不含 senderId, receiverId)
+                AdminMessageVO.AdminMessageVOBuilder messageVOBuilder = AdminMessageVO.builder()
+                        .sessionId(sessionId.toString())
+                        .content(message.getMessage())
+                        .type(message.getMessageType())
+                        .meta(message.getMeta() == null ? null
+                                : objectMapper.readValue(message.getMeta(), new TypeReference<Map<String, Object>>() {
+                                }))
+                        .timestamp(message.getTime())
+                        .status(message.getStatus())
+                        .id(message.getId().toString()); // 假设 message.getId() 不为 null
+
+                // 确定 Sender ID 和 Receiver ID (Integer 类型)
+                Integer senderId = null;
+                Integer receiverId = null;
+                Sender senderEnum = message.getSender();
+
+                if (senderEnum == Sender.Admin) {
+                    // 发送者标记为 Admin，必定是 Participant 1
+                    senderId = participant1AdminId;
+                    // 接收者根据会话类型确定
+                    receiverId = isAdminAdminChat ? participant2AdminId : participant2UserId;
+                } else if (senderEnum == Sender.User) {
+                    // 发送者标记为 User，理论上只应发生在 Admin-User 会话
+                    if (!isAdminAdminChat) { // 确认是 Admin-User 会话
+                        senderId = participant2UserId; // 发送者是 P2 User
+                        receiverId = participant1AdminId; // 接收者是 P1 Admin
+                    } else {
+                        // 数据不一致：Admin-Admin 会话，但发送者标记为 User
+                        log.warn("数据不一致：消息 (ID:{}) 发送者标记为 User，但在 Admin-Admin 会话 (SessionId:{}) 中。", message.getId(),
+                                sessionId);
+                        // 采取一种策略，例如假设是 P2 Admin 发送的，但要谨慎
+                        senderId = participant2AdminId; // 假设发送者是 P2 Admin
+                        receiverId = participant1AdminId; // 接收者是 P1 Admin
+                        log.warn("假设 participant2Admin ({}) 发送了此消息。", senderId);
+                        // 或者可以选择跳过此消息: continue;
+                    }
+                } else {
+                    log.error("未知的发送者类型 '{}' 在消息 ID: {}", senderEnum, message.getId());
+                    continue; // 跳过此无法处理的消息
+                }
+                // 最终检查并设置 ID 到 VO 中
+                if (senderId == null || receiverId == null) {
+                    log.error("无法确定消息 ID {} 的发送者 ({}) 或接收者 ({})。会话类型: {}, P1: {}, P2U: {}, P2A: {}",
+                            message.getId(), senderId, receiverId, isAdminAdminChat ? "Admin-Admin" : "Admin-User",
+                            participant1AdminId, participant2UserId, participant2AdminId);
+                    continue; // 跳过此消息
+                }
+
+                messageVOBuilder.senderId(senderId.toString());
+                messageVOBuilder.receiverId(receiverId.toString());
+
+                // 添加到结果列表
+                messageVOs.add(messageVOBuilder.build());
+
+            } catch (JsonProcessingException e) {
+                log.error("处理消息 Meta (ID: {}) 时发生 JSON 解析错误: {}", message.getId(), e.getMessage());
+                // 可以选择跳过此消息或如何处理
+                continue;
+            } catch (Exception e) {
+                // 捕获其他潜在异常，防止循环中断
+                log.error("处理消息 (ID: {}) 时发生未知错误: {}", message.getId(), e.getMessage(), e);
+                continue;
             }
-            messageVOs.add(messageVO);
-        }
+        } // 结束 for 循环
         return messageVOs;
     }
 

@@ -52,6 +52,18 @@ public interface AdminMapper {
     })
     List<Consult> getConsultInfoByAdminId(Integer adminId);
 
+    @Select("SELECT c.consult_id, c.participant1_admin_id AS user_id, c.status " + // 1. 加上 status
+                    "FROM consult_record c " +
+                    "WHERE c.participant2_admin_id = #{adminId} AND c.participant2_user_id IS NULL") // 2. 加上类型过滤条件
+    @Results({
+                    @Result(property = "consultId", column = "consult_id", id = true), // 3. 显式映射 consultId
+                    @Result(property = "participant1AdminId", column = "user_id"), // 4. 显式映射 userId (来自别名)
+                    @Result(property = "adminId", column = "user_id"), // 5. 显式映射 userId (来自别名)
+                    @Result(property = "status", column = "status", javaType = ConsultStatus.class, // 6. 映射 status
+                                    typeHandler = EnumTypeHandler.class)
+    })
+    List<Consult> getSupervisorConsultInfoByCounselorId(Integer adminId);
+
     
     
 
