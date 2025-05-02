@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mygo.mapper.ChatMapper">
+
     <select id="getMessageId" resultType="Integer">
         select id
         from message
-        where consult_id = (SELECT consult_id
-                            FROM consult_record
-                            WHERE admin_id = #{adminId}
-                              AND user_id = #{userId}
-                              AND status = 'progressing')
+        where consult_id = (
+            SELECT consult_id
+            FROM consult_record
+            WHERE participant1_admin_id = #{adminId}  -- 修改: 使用 participant1_admin_id
+              AND participant2_user_id = #{userId}    -- 修改: 使用 participant2_user_id
+              AND participant2_admin_id IS NULL       -- 新增: 确认这是 admin-user 类型
+              AND status = 'progressing'
+            -- 注意: 这个子查询假设满足条件的记录只有一条。
+            -- 如果 (p1_admin, p2_user, status='progressing') 可能匹配多条记录，子查询会返回多个 consult_id，导致外层查询 `where consult_id = (...)` 出错。
+            -- 但我们暂时保持与原结构一致，原版子查询也没有 LIMIT 1。
+        )
         order by time desc limit 1
     </select>
-</mapper>
+
+    </mapper>

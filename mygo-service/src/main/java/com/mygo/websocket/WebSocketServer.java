@@ -15,6 +15,7 @@ import com.mygo.utils.Context;
 import com.mygo.utils.JwtTool;
 import com.mygo.vo.AdminMessageVO;
 import com.mygo.vo.UserMessageVO;
+import jakarta.annotation.PostConstruct;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
@@ -52,24 +53,47 @@ public class WebSocketServer {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    private static ChatService chatService;
+    // 静态字段用于在WebSocket事件方法中访问
+    private static ChatService staticChatService;
+    private static JwtTool staticJwtTool;
+    private static ChatMapper staticChatMapper;
 
-    private static JwtTool jwtTool;
-
-    private ChatMapper chatMapper;
+    // 非静态字段用于Spring注入
+    @Autowired
+    private ChatService chatService;
 
     @Autowired
-    public void setWebSocketServer(ChatService chatService,JwtTool jwtTool) {
-        WebSocketServer.chatService = chatService;
-        WebSocketServer.jwtTool = jwtTool;
+    private JwtTool jwtTool;
+
+    @Autowired
+    private ChatMapper chatMapper;
+
+    @PostConstruct
+    public void init() {
+        // 将实例字段的引用赋值给对应的静态字段
+        staticChatService = this.chatService;
+        staticJwtTool = this.jwtTool;
+        staticChatMapper = this.chatMapper;
+        log.info("WebSocketServer依赖注入成功: chatService={}, jwtTool={}, chatMapper={}", 
+                staticChatService != null ? "注入成功" : "注入失败", 
+                staticJwtTool != null ? "注入成功" : "注入失败", 
+                staticChatMapper != null ? "注入成功" : "注入失败");
     }
 
     @OnOpen
-    public void onOpen(Session session, @PathParam("device") String device,@PathParam("token")String token) throws IOException {
+    public void onOpen(Session session, @PathParam("device") String device, @PathParam("token") String token) throws IOException {
         //将请求头中的用户id和请求路径中的管理端/用户端标识拼接，并和Session一起存入双向哈希表中
         if (!Objects.equals(device, "admin") && !Objects.equals(device, "user")) session.close();
         System.out.println(token);
-        Integer id=jwtTool.parseJWT(token);
+        
+        // 使用静态字段
+        if (staticJwtTool == null) {
+            log.error("staticJwtTool为null，无法处理WebSocket连接");
+            session.close();
+            return;
+        }
+        
+        Integer id = staticJwtTool.parseJWT(token);
         System.out.println(id);
         String key = device + "_" + id;
         idToSessionMap.put(key, session);
@@ -91,6 +115,14 @@ public class WebSocketServer {
 
     @OnMessage
     public void onMessage(String jsonMessage, Session session) throws JsonProcessingException {
+        // 检查依赖是否已经正确注入
+        if (staticChatService == null || staticChatMapper == null) {
+            log.error("依赖注入失败: chatService={}, chatMapper={}", 
+                    staticChatService != null ? "可用" : "不可用", 
+                    staticChatMapper != null ? "可用" : "不可用");
+            return;
+        }
+        
         /*1.根据Session查询发送方id
          * 这里为什么不让发送者直接发一个id过来？
          * 因为这样同样不知道发送者是用户端还是管理端的。
@@ -120,7 +152,7 @@ public class WebSocketServer {
             messageDTO.setToId(Integer.valueOf(adminMessageDTO.getReceiverId()));
         }
         Integer toId= messageDTO.getToId();
-        Integer toRole = chatMapper.getRole(toId);
+        Integer toRole = staticChatMapper.getRole(toId);
         String toDevice;
         if(toRole==null){
             //是咨询师和用户的聊天
@@ -134,7 +166,7 @@ public class WebSocketServer {
                 LocalDateTime.now());
         log.info("messageFromToDTO: " + messageFromToDTO.toString());
         //2.在数据库中插入数据
-        chatService.receiveMessage(messageFromToDTO);
+        staticChatService.receiveMessage(messageFromToDTO);
 
         //3.转发消息。这步不放在chatService中是因为会造成循环依赖。
         sendMessage(messageFromToDTO);
@@ -142,10 +174,16 @@ public class WebSocketServer {
 
     //双发消息
     public void sendMessage(MessageFromToDTO messageFromToDTO) throws JsonProcessingException {
+        // 检查依赖是否已经正确注入
+        if (staticChatService == null) {
+            log.error("依赖注入失败: chatService不可用");
+            return;
+        }
+        
         log.info("开始转发消息");
         log.info(messageFromToDTO.toString());
-        boolean toIsUser = Objects.equals(messageFromToDTO.getToId(), "user");
-        boolean fromIdUser = Objects.equals(messageFromToDTO.getFromId(), "user");
+        boolean toIsUser = Objects.equals(messageFromToDTO.getToId().split("_")[0], "user");
+        boolean fromIdUser = Objects.equals(messageFromToDTO.getFromId().split("_")[0], "user");
         if (toIsUser||fromIdUser) {
             Session userSession;
             Session adminSession;
@@ -183,9 +221,9 @@ public class WebSocketServer {
                                 .split("_")[1])
                         .timestamp(messageFromToDTO.getTime())
                         .build();
-                adminMessageVO.setId(chatService.getMessageId(messageFromToDTO)
+                adminMessageVO.setId(staticChatService.getMessageId(messageFromToDTO)
                         .toString());
-                adminMessageVO.setSessionId(chatService.getConsultId(messageFromToDTO)
+                adminMessageVO.setSessionId(staticChatService.getConsultId(messageFromToDTO)
                         .toString());
                 adminSession.getAsyncRemote()
                         .sendText(objectMapper.writeValueAsString(adminMessageVO));
@@ -209,9 +247,9 @@ public class WebSocketServer {
                             .split("_")[1])
                     .timestamp(messageFromToDTO.getTime())
                     .build();
-            adminMessageVO.setId(chatService.getMessageId(messageFromToDTO)
+            adminMessageVO.setId(staticChatService.getMessageId(messageFromToDTO)
                     .toString());
-            adminMessageVO.setSessionId(chatService.getConsultId(messageFromToDTO)
+            adminMessageVO.setSessionId(staticChatService.getConsultId(messageFromToDTO)
                     .toString());
             if(adminToSession!=null){
                 adminToSession.getAsyncRemote()
@@ -225,13 +263,5 @@ public class WebSocketServer {
             }
 
         }
-
-
     }
-
-    @Autowired
-    public void setChatMapper(ChatMapper chatMapper) {
-        this.chatMapper = chatMapper;
-    }
-
 }
