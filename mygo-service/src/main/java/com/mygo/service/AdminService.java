@@ -56,6 +56,8 @@ public interface AdminService {
 
     SelectUserVO getAllUserById(Integer userId);
 
+    SelectAdminVO getAdminById(Integer adminId);
+
 }
 
 

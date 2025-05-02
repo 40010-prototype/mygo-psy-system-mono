@@ -112,6 +112,11 @@ public class AdminController {
         return Result.success(user);
     }
 
+    @GetMapping("/users/admin/{adminId}")
+    public Result<SelectAdminVO> getAdminById(@PathVariable Integer adminId) {
+        SelectAdminVO admin = adminService.getAdminById(adminId);
+        return Result.success(admin);
+    }
 
     @GetMapping("/getBindSupervisorInfo")
     public Result<HelpVO> getHelpSessionId(){
