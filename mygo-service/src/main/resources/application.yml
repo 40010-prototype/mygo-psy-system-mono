@@ -17,6 +17,9 @@ spring:
     password: mpw:jyLRm9mWq9o6tXAOYLefQtmFm/TH40oZX8K1eD5Fxy0=
     default-encoding: UTF-8
 
+  jackson:
+    time-zone: Asia/Shanghai # 或者 GMT+8
+
 
 
 logging:
@@ -39,8 +42,8 @@ mybatis-plus:
 mygo:
   jwt:
     location: classpath:mygo.jks # hs256密钥对
-    store-password: mpw:/4VrGA1afDwyytMgtd2NIg== # jks文件的密码
-    key-password: mpw:/4VrGA1afDwyytMgtd2NIg== #
+    store-password: mygomygo # jks文件的密码
+    key-password: mygomygo #
     alias: mygo
     tokenTTL: 7d
   project-info:
