@@ -382,11 +382,44 @@ public class AdminServiceImpl implements AdminService {
     // }
 
     public List<AdminSessionVO> getSession() {
-        //1.查询相关consultId和UserId
+        log.info("adminService.getSession()开始");
         Integer id = Context.getId();
-        List<Consult> consults = adminMapper.getConsultInfoByAdminId(id);
         List<AdminSessionVO> sessions = new ArrayList<>();
-        //2.构建VO
+
+        // 0.查询督导-咨询师会话，如果有，直接返回
+        List<Consult> supervisorCounselorConsults = adminMapper.getSupervisorConsultInfoBySupervisorId(id);
+        for (Consult supervisorCounselorConsult : supervisorCounselorConsults) {
+            if (supervisorCounselorConsult != null) {
+                AdminSessionVO adminSessionVO = AdminSessionVO.builder()
+                        .id(supervisorCounselorConsult.getConsultId().toString())
+                        .clientId(supervisorCounselorConsult.getParticipant2AdminId().toString())
+                        .counselorId(id.toString())
+                        .build();
+                log.info("现在的ID: {}", id);
+                log.info("获取到督导-咨询师会话: {}", supervisorCounselorConsult);
+                Admin user = adminMapper.getAdminById(supervisorCounselorConsult.getParticipant2AdminId());
+                adminSessionVO.setClientAvatar(user.getAvatar());
+                adminSessionVO.setClientName(user.getAccountName());
+                adminSessionVO.setStatus(UserStatus.ACTIVE);
+                Admin admin = adminMapper.getAdminById(id);
+                adminSessionVO.setCounselorAvatar(admin.getAvatar());
+                adminSessionVO.setCounselorName(admin.getAccountName());
+                LastMessageAndTime lastMessageAndTime = chatMapper.getLastMessage(supervisorCounselorConsult.getConsultId());
+                if (lastMessageAndTime != null) {
+                    adminSessionVO.setLastMessage(lastMessageAndTime.getMessage());
+                    adminSessionVO.setLastMessageTime(lastMessageAndTime.getTime());
+                }
+                sessions.add(adminSessionVO);
+            }
+        }
+        if(!sessions.isEmpty()){
+            return sessions;
+        }
+
+        
+        // 1.查询相关consultId和UserId
+        List<Consult> consults = adminMapper.getConsultInfoByAdminId(id);
+        // 2.构建VO
         for (Consult consult : consults) {
             log.info(String.valueOf(consult.getParticipant2UserId()));
             AdminSessionVO adminSessionVO = AdminSessionVO.builder()
@@ -410,22 +443,22 @@ public class AdminServiceImpl implements AdminService {
             }
             sessions.add(adminSessionVO);
         }
-        //3.查询督导-咨询师会话
-        Consult supervisorConsult = adminMapper.getSupervisorConsultInfoByCounselorId(id).get(0);
-        if (supervisorConsult != null) {
+        // 3.查询咨询师-督导会话
+        Consult counselorSupervisorConsult = adminMapper.getSupervisorConsultInfoByCounselorId(id).get(0);
+        if (counselorSupervisorConsult != null) {
             AdminSessionVO adminSessionVO = AdminSessionVO.builder()
-                    .id(supervisorConsult.getConsultId().toString())
+                    .id(counselorSupervisorConsult.getConsultId().toString())
                     .clientId(id.toString())
-                    .counselorId(supervisorConsult.getAdminId().toString())
+                    .counselorId(counselorSupervisorConsult.getAdminId().toString())
                     .build();
             Admin user = adminMapper.getAdminById(id);
             adminSessionVO.setClientAvatar(user.getAvatar());
             adminSessionVO.setClientName(user.getAccountName());
             adminSessionVO.setStatus(UserStatus.ACTIVE);
-            Admin admin = adminMapper.getAdminById(supervisorConsult.getAdminId());
+            Admin admin = adminMapper.getAdminById(counselorSupervisorConsult.getAdminId());
             adminSessionVO.setCounselorAvatar(admin.getAvatar());
             adminSessionVO.setCounselorName(admin.getAccountName());
-            LastMessageAndTime lastMessageAndTime = chatMapper.getLastMessage(supervisorConsult.getConsultId());
+            LastMessageAndTime lastMessageAndTime = chatMapper.getLastMessage(counselorSupervisorConsult.getConsultId());
             if (lastMessageAndTime != null) {
                 adminSessionVO.setLastMessage(lastMessageAndTime.getMessage());
                 adminSessionVO.setLastMessageTime(lastMessageAndTime.getTime());
