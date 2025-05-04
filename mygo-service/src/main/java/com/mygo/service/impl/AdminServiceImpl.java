@@ -1120,4 +1120,34 @@ public class AdminServiceImpl implements AdminService {
                 .build();
     }
 
+    /**
+     * 更新管理员信息
+     * @param adminUpdateDTO 更新信息DTO，包括如下字段：<br>
+     *                       ID、姓名、邮箱、电话、个人资料
+     */
+    @Override
+    public void updateAdmin(AdminUpdateDTO adminUpdateDTO) throws JsonProcessingException {
+        // 1. 从上下文获取当前登录用户ID
+        Integer adminId = Context.getId();
+        
+        // 2. 确认要更新的用户ID是否与当前登录用户一致
+        if (!adminId.toString().equals(adminUpdateDTO.getId())) {
+            throw new BadRequestException("只能更新自己的信息");
+        }
+        
+        // 3. 获取当前管理员信息
+        Admin admin = adminMapper.getAdminById(adminId);
+        if (admin == null) {
+            throw new BadRequestException(ErrorMessage.USER_NOT_FOUND);
+        }
+        
+        // 4. 更新管理员基本信息
+        adminMapper.updateAdminBasicInfo(adminId, adminUpdateDTO.getName(), adminUpdateDTO.getEmail(), adminUpdateDTO.getPhone());
+        
+        // 5. 将profile对象转换为JSON字符串
+        String profileJson = objectMapper.writeValueAsString(adminUpdateDTO.getProfile());
+        
+        // 6. 更新管理员个人资料
+        adminMapper.updateAdminInfo(adminId, profileJson);
+    }
 }

@@ -165,4 +165,7 @@ public interface AdminMapper {
 
         @Update("update admin set info=#{info} where admin_id=#{adminId}")
         void updateAdminInfo(Integer adminId, String info);
+
+        @Update("update admin set real_name=#{realName}, email=#{email}, phone=#{phone} where admin_id=#{adminId}")
+        void updateAdminBasicInfo(Integer adminId, String realName, String email, String phone);
 }

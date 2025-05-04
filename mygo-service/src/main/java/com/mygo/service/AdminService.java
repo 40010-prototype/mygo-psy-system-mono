@@ -58,6 +58,8 @@ public interface AdminService {
 
     SelectAdminVO getAdminById(Integer adminId);
 
+    void updateAdmin(AdminUpdateDTO adminUpdateDTO) throws JsonProcessingException;
+
 }
 
 
