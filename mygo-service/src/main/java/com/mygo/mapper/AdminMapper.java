@@ -99,8 +99,8 @@ public interface AdminMapper {
         @Insert("insert into date_status(admin_id,date) value(#{adminId},#{date})")
         void addScheduleStatus(LocalDate date, Integer adminId);
 
-        @Update("update date_status set approval_status='approved' where id=#{scheduleId}")
-        void approveScheduleByDay(Integer scheduleId);
+        @Update("update date_status set approval_status='approved' where admin_id=#{counselorId} and date=DATE(#{date})")
+        void approveScheduleByDay(Integer counselorId, Date date);
 
         @Update("update schedule set approval_status='approved' where schedule_id=#{timeSlotId}")
         void approveScheduleByTimeSlot(Integer timeSlotId);

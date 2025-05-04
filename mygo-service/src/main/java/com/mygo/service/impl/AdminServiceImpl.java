@@ -622,8 +622,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void approveScheduleByDay(Integer scheduleId) {
-        adminMapper.approveScheduleByDay(scheduleId);
+    public void approveScheduleByDay(Integer counselorId, Date date) {
+        adminMapper.approveScheduleByDay(counselorId, date);
     }
 
     @Override
@@ -650,6 +650,8 @@ public class AdminServiceImpl implements AdminService {
         List<ScheduleAndStatusDTO> schedules = new ArrayList<>();
         List<DateAndStatusDTO> dateAndStatusDTOS = adminMapper.getDateAndStatusBetween(startDate, endDate, adminId);
         for (DateAndStatusDTO dateAndStatus : dateAndStatusDTOS) {
+            log.info(dateAndStatus.getDate()
+                    .toString());
             AddScheduleList(adminId, schedules, dateAndStatus);
         }
         adminScheduleVO.setSchedules(schedules);

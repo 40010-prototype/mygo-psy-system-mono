@@ -28,7 +28,7 @@ public interface AdminService {
 
     void addSchedule(AdminAddScheduleDTO adminAddScheduleDTO);
 
-    void approveScheduleByDay(Integer scheduleId);
+    void approveScheduleByDay(Integer counselorId, Date date);
 
     void approveScheduleByTimeSlot(Integer timeSlotId);
 

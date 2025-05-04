@@ -36,9 +36,9 @@ public class ScheduleController {
         return Result.success(scheduleByCounselor);
     }
 
-    @PostMapping("/schedules/{scheduleId}/daily/{date}/approve")
-    Result<Void> ApproveScheduleByDay(@PathVariable Integer scheduleId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-        adminService.approveScheduleByDay(scheduleId);
+    @PostMapping("/schedules/{counslorId}/daily/{date}/approve")
+    Result<Void> ApproveScheduleByDay(@PathVariable Integer counslorId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        adminService.approveScheduleByDay(counslorId, date);
         return Result.success();
     }
 
