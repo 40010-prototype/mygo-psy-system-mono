@@ -153,7 +153,7 @@ public class AdminController {
         return Result.success();
     }
 
-    @GetMapping("/admin/geminiSetting/load/{id}")
+    @GetMapping("/geminiSetting/load/{id}")
     public Result<GeminiSetting> loadGeminiSetting(@PathVariable Integer id) {
         adminService.loadGeminiSettring(id);
         return Result.success(new GeminiSetting());
