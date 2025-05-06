@@ -28,7 +28,7 @@ public interface AdminService {
 
     void addSchedule(AdminAddScheduleDTO adminAddScheduleDTO);
 
-    void approveScheduleByDay(Integer scheduleId);
+    void approveScheduleByDay(Integer counselorId, Date date);
 
     void approveScheduleByTimeSlot(Integer timeSlotId);
 
@@ -46,9 +46,19 @@ public interface AdminService {
 
     void setHelp(Integer counselorId);
 
+    void removeHelp(Integer counselorId);
+
+    void setHelp(Integer supervisorId, Integer counselorId);
+
+    void removeHelp(Integer supervisorId, Integer counselorId);
+
     List<SelectUserVO> getAllUser();
 
     SelectUserVO getAllUserById(Integer userId);
+
+    SelectAdminVO getAdminById(Integer adminId);
+
+    void updateAdmin(AdminUpdateDTO adminUpdateDTO) throws JsonProcessingException;
 
 }
 

@@ -3,6 +3,7 @@ package com.mygo.controller.admin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.dto.AdminLoginDTO;
 import com.mygo.dto.AdminRegisterDTO;
+import com.mygo.dto.AdminUpdateDTO;
 import com.mygo.dto.ResetPasswordDTO;
 import com.mygo.enumeration.Role;
 import com.mygo.result.Result;
@@ -112,6 +113,11 @@ public class AdminController {
         return Result.success(user);
     }
 
+    @GetMapping("/users/admin/{adminId}")
+    public Result<SelectAdminVO> getAdminById(@PathVariable Integer adminId) {
+        SelectAdminVO admin = adminService.getAdminById(adminId);
+        return Result.success(admin);
+    }
 
     @GetMapping("/getBindSupervisorInfo")
     public Result<HelpVO> getHelpSessionId(){
@@ -120,8 +126,22 @@ public class AdminController {
     }
 
     @PostMapping("/assignments/{supervisorId}/{counselorId}")
-    public Result<Void> setHelp(@PathVariable Integer counselorId,@PathVariable Integer supervisorId) {
-        adminService.setHelp(counselorId);
+    public Result<Void> setHelp(@PathVariable Integer counselorId, @PathVariable Integer supervisorId, 
+                               @RequestParam(defaultValue = "bind") String action) {
+        if ("bind".equals(action)) {
+            adminService.setHelp(supervisorId, counselorId);
+        } else if ("unbind".equals(action)) {
+            adminService.removeHelp(supervisorId, counselorId);
+        } else {
+            return Result.error("不支持的操作");
+        }
+        return Result.success();
+    }
+
+    @PutMapping("/user/update")
+    @Operation(summary = "更新管理员信息")
+    public Result<Void> updateAdmin(@RequestBody AdminUpdateDTO adminUpdateDTO) throws JsonProcessingException {
+        adminService.updateAdmin(adminUpdateDTO);
         return Result.success();
     }
 
