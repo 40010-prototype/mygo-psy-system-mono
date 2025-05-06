@@ -1,14 +1,18 @@
 package com.mygo.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.constant.RedisConstant;
 import com.mygo.dto.MessageFromToDTO;
 import com.mygo.dto.UserAddInfoDTO;
 import com.mygo.dto.UserLoginDTO;
 import com.mygo.dto.UserRegisterDTO;
+import com.mygo.entity.Consult;
+import com.mygo.entity.Message;
 import com.mygo.entity.User;
 import com.mygo.enumeration.MessageType;
+import com.mygo.enumeration.Sender;
 import com.mygo.exception.BadRequestException;
 import com.mygo.mapper.AdminMapper;
 import com.mygo.mapper.ChatMapper;
@@ -20,7 +24,9 @@ import com.mygo.utils.IdTool;
 import com.mygo.utils.JwtTool;
 import com.mygo.utils.PasswordEncoder;
 import com.mygo.vo.ActiveCounselorVO;
+import com.mygo.vo.AdminMessageVO;
 import com.mygo.vo.UserLoginVO;
+import com.mygo.vo.UserMessageVO;
 import com.mygo.websocket.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -33,6 +39,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -140,6 +147,63 @@ public class UserServiceImpl implements UserService {
                 counselorId.toString(), MessageType.TEXT, "您好，向您咨询一些心理问题", null, LocalDateTime.now());
         chatService.receiveMessage(messageFromToDTO);
         webSocketServer.sendMessage(messageFromToDTO);
+    }
+
+    @Override
+    public List<UserMessageVO> getMessages(Integer counselorId) throws JsonProcessingException { // 注意：如果代码中不再有操作抛出
+                                                                                                 // JsonProcessingException，可以移除
+                                                                                                 // throws 声明
+        Integer userId = Context.getId();
+        Integer sessionId = chatMapper.getConsult(userId, counselorId);
+
+        // 检查 sessionId 是否有效，避免后续空指针等问题 (可选但推荐)
+        if (sessionId == null) {
+            // 可以返回空列表或抛出异常，取决于业务逻辑
+            return new ArrayList<>();
+        }
+
+        List<Message> messages = adminMapper.getHistoryMessageBySessionId(sessionId, 999, 0);
+        List<UserMessageVO> messageVOs = new ArrayList<>();
+
+        for (Message message : messages) {
+            Integer senderId;
+            Integer receiverId;
+
+            if (message.getSender() == Sender.User) {
+                senderId = userId;
+                receiverId = counselorId;
+            } else {
+                senderId = counselorId;
+                receiverId = userId;
+            }
+
+            try {
+                // 1. 使用 builder 配置
+                // 2. 调用 .build() 创建对象
+                UserMessageVO messageVO = UserMessageVO.builder()
+                        .fromId(senderId)
+                        .toId(receiverId)
+                        .messageType(message.getMessageType())
+                        .message(message.getMessage())
+                        // 可能还需要设置其他 messageVO 的属性，比如时间戳等
+                        .build(); // <-- 关键：调用 build() 创建对象
+
+                // 3. 将创建的对象添加到 list 中
+                messageVOs.add(messageVO); // <-- 关键：添加到列表
+
+            } catch (Exception e) {
+                // 这里的异常处理需要根据实际情况调整
+                // 如果 builder().build() 可能因为数据问题失败，需要记录日志或采取其他措施
+                // 直接抛出 BadRequestException 可能不合适，除非明确是客户端请求数据导致的问题
+                // 例如，可以记录错误日志并跳过这条消息：
+                System.err.println("Error processing message: " + message.getId() + ", error: " + e.getMessage());
+                // 或者根据业务需求决定是否抛出异常中断整个过程
+                // throw new RuntimeException("Failed to process message " + message.getId(),
+                // e);
+            }
+        } // 结束 for 循环
+
+        return messageVOs; // 返回包含转换后对象的列表
     }
 
 }

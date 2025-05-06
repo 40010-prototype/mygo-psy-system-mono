@@ -6,6 +6,7 @@ import com.mygo.dto.UserLoginDTO;
 import com.mygo.dto.UserRegisterDTO;
 import com.mygo.vo.ActiveCounselorVO;
 import com.mygo.vo.UserLoginVO;
+import com.mygo.vo.UserMessageVO;
 
 import java.util.List;
 
@@ -20,5 +21,7 @@ public interface UserService {
     List<ActiveCounselorVO> getActiveCounselor();
 
     void setSession(Integer counselorId) throws JsonProcessingException;
+
+    List<UserMessageVO> getMessages(Integer counselorId) throws JsonProcessingException;
 
 }

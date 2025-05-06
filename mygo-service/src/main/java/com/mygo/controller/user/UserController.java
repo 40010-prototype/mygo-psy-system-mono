@@ -8,7 +8,10 @@ import com.mygo.dto.UserRegisterDTO;
 import com.mygo.result.Result;
 import com.mygo.service.UserService;
 import com.mygo.vo.ActiveCounselorVO;
+import com.mygo.vo.AdminMessageVO;
 import com.mygo.vo.UserLoginVO;
+import com.mygo.vo.UserMessageVO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +62,12 @@ public class UserController {
     public Result<Void> setSession(@PathVariable("counselorId") Integer counselorId) throws JsonProcessingException {
         userService.setSession(counselorId);
         return Result.success();
+    }
+
+    @GetMapping("/sessions/messages")
+    public Result<List<UserMessageVO>> getMessages(@RequestParam Integer counselorId) throws JsonProcessingException {
+        List<UserMessageVO> messages = userService.getMessages(counselorId);
+        return Result.success(messages);
     }
 
 }
