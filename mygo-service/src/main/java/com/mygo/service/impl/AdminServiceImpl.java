@@ -777,7 +777,7 @@ public class AdminServiceImpl implements AdminService {
                     .createdAt(counselor.getCreatedAt().toString())
                     .build();
             vo.add(selectCounselorVO);
-        }
+
         return vo;
     }
 
