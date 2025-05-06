@@ -5,6 +5,8 @@ import lombok.Data;
 @Data
 public class UserAddInfoDTO {
 
+    private String name;
+
     private String phone;
 
     private String gender;

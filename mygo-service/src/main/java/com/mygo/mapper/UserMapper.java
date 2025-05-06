@@ -25,10 +25,10 @@ public interface UserMapper {
             EnumTypeHandler.class)
     User selectUserById(Integer userId);
 
-    @Update("UPDATE user SET phone=#{phone} and gender=#{gender} and age=#{age} and " +
+    @Update("UPDATE user SET name=#{name} and phone=#{phone} and gender=#{gender} and age=#{age} and " +
             "emergency_contact=#{emergencyContact} and emergency_contact_phone=#{emergencyContactPhone} WHERE " +
             "user_id=#{id}")
-    void updateInfo(String phone, String gender, Integer age, String emergencyContact, String emergencyContactPhone);
+    void updateInfo(String name,String phone, String gender, Integer age, String emergencyContact, String emergencyContactPhone,Integer id);
 
     @Select("select admin_id from schedule where date=#{date} and #{time} between start_time and end_time")
     List<Integer> getActiveCounselor(Date date, LocalTime time);

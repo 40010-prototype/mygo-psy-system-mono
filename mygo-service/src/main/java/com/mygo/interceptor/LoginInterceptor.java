@@ -46,7 +46,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
         //2.基于token获取用户
         Integer id = jwtTool.parseJWT(token);
-        log.info("token解析成功");
+        log.info("token解析成功,id为{}",id);
         //3.基于id在redis中查找用户
         String userinfo = stringRedisTemplate.opsForValue()
                 .get(RedisConstant.JWT_KEY + id);

@@ -102,8 +102,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addInfo(UserAddInfoDTO userAddInfoDTO) {
-        userMapper.updateInfo(userAddInfoDTO.getPhone(), userAddInfoDTO.getGender(), userAddInfoDTO.getAge(),
-                userAddInfoDTO.getEmergencyContact(), userAddInfoDTO.getEmergencyContactPhone());
+        userMapper.updateInfo(userAddInfoDTO.getName(),userAddInfoDTO.getPhone(), userAddInfoDTO.getGender(), userAddInfoDTO.getAge(),
+                userAddInfoDTO.getEmergencyContact(), userAddInfoDTO.getEmergencyContactPhone(),Context.getId());
     }
 
     @Override
