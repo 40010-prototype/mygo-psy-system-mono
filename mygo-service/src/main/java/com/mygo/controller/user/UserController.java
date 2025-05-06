@@ -1,10 +1,7 @@
 package com.mygo.controller.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mygo.dto.UserAddInfoDTO;
-import com.mygo.dto.UserDTO;
-import com.mygo.dto.UserLoginDTO;
-import com.mygo.dto.UserRegisterDTO;
+import com.mygo.dto.*;
 import com.mygo.result.Result;
 import com.mygo.service.UserService;
 import com.mygo.vo.ActiveCounselorVO;
@@ -61,6 +58,12 @@ public class UserController {
     @PostMapping("/setSession/{counselorId}")
     public Result<Void> setSession(@PathVariable("counselorId") Integer counselorId) throws JsonProcessingException {
         userService.setSession(counselorId);
+        return Result.success();
+    }
+
+    @PostMapping("/endSession")
+    public Result<Void> endSession(@RequestBody EndSessionDTO endSessionDTO) {
+        userService.endSession(endSessionDTO);
         return Result.success();
     }
 

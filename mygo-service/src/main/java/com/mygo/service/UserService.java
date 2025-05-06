@@ -1,6 +1,7 @@
 package com.mygo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mygo.dto.EndSessionDTO;
 import com.mygo.dto.UserAddInfoDTO;
 import com.mygo.dto.UserLoginDTO;
 import com.mygo.dto.UserRegisterDTO;
@@ -23,5 +24,7 @@ public interface UserService {
     void setSession(Integer counselorId) throws JsonProcessingException;
 
     List<UserMessageVO> getMessages(Integer counselorId) throws JsonProcessingException;
+
+    void endSession(EndSessionDTO counselorId);
 
 }

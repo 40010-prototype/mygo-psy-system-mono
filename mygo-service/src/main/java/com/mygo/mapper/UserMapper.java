@@ -25,9 +25,9 @@ public interface UserMapper {
             EnumTypeHandler.class)
     User selectUserById(Integer userId);
 
-    @Update("UPDATE user SET name=#{name} and phone=#{phone} and gender=#{gender} and age=#{age} and " +
-            "emergency_contact=#{emergencyContact} and emergency_contact_phone=#{emergencyContactPhone} WHERE " +
-            "user_id=#{id}")
+    @Update("UPDATE user SET name=#{name}, phone=#{phone}, gender=#{gender}, age=#{age}, " +
+            "emergency_contact=#{emergencyContact}, emergency_contact_phone=#{emergencyContactPhone} " +
+            "WHERE user_id=#{id}")
     void updateInfo(String name,String phone, String gender, Integer age, String emergencyContact, String emergencyContactPhone,Integer id);
 
     @Select("select admin_id from schedule where date=#{date} and #{time} between start_time and end_time")
@@ -37,5 +37,8 @@ public interface UserMapper {
     @Result(property = "status", column = "status", javaType = UserStatus.class, typeHandler =
             EnumTypeHandler.class)
     List<User> selectAllUser();
+
+    @Update("update consult_record set score=#{score},status='finished' where participant1_admin_id=#{counselorId} and participant2_user_id=#{userId}")
+    void endSession(Integer userId, Integer counselorId, Integer score);
 
 }

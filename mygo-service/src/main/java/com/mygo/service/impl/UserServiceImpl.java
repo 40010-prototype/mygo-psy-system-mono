@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mygo.constant.RedisConstant;
-import com.mygo.dto.MessageFromToDTO;
-import com.mygo.dto.UserAddInfoDTO;
-import com.mygo.dto.UserLoginDTO;
-import com.mygo.dto.UserRegisterDTO;
+import com.mygo.dto.*;
 import com.mygo.entity.Consult;
 import com.mygo.entity.Message;
 import com.mygo.entity.User;
@@ -204,6 +201,14 @@ public class UserServiceImpl implements UserService {
         } // 结束 for 循环
 
         return messageVOs; // 返回包含转换后对象的列表
+    }
+
+    @Override
+    public void endSession(EndSessionDTO endSessionDTO) {
+        Integer userId = Context.getId();
+        Integer counselorId=endSessionDTO.getCounselorId();
+        Integer score = endSessionDTO.getScore();
+        userMapper.endSession(userId,counselorId,score);
     }
 
 }
