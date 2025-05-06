@@ -2,12 +2,14 @@ package com.mygo.vo;
 
 import com.mygo.enumeration.MessageType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class UserMessageVO {
 

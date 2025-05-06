@@ -93,7 +93,7 @@ public interface ChatMapper {
 
 
 
-    @Select("select consult_id from consult_record where participant2_user_id=#{userId} and participant1_admin_id=#{counselorId}")
+    @Select("select consult_id from consult_record where participant2_user_id=#{userId} and participant1_admin_id=#{counselorId} and status='progressing'")
     Integer getConsult(Integer userId, Integer counselorId);
 
     @Select("select admin_id from admin where admin_id=#{toId}")
