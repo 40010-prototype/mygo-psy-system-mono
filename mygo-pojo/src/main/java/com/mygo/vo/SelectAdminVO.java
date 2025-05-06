@@ -1,5 +1,6 @@
 package com.mygo.vo;
 
+import com.mygo.entity.Info;
 import com.mygo.enumeration.Role;
 import lombok.Builder;
 import lombok.Data;

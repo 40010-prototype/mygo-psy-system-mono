@@ -34,6 +34,8 @@ public interface UserMapper {
     List<Integer> getActiveCounselor(Date date, LocalTime time);
 
     @Select("select * from user")
+    @Result(property = "status", column = "status", javaType = UserStatus.class, typeHandler =
+            EnumTypeHandler.class)
     List<User> selectAllUser();
 
 }

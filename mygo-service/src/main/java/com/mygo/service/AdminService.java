@@ -2,6 +2,7 @@ package com.mygo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mygo.dto.*;
+import com.mygo.entity.GeminiSetting;
 import com.mygo.enumeration.Role;
 import com.mygo.vo.*;
 
@@ -40,7 +41,7 @@ public interface AdminService {
 
     List<AdminScheduleVO> getPendingScheduleBySupervisor(Date startDate, Date endDate);
 
-    List<SelectAdminVO> getAllAdminByRole(Role role);
+    List<SelectAdminVO> getAllAdminByRole(Role role) throws JsonProcessingException;
 
     HelpVO getHelpSessionId();
 
@@ -59,6 +60,10 @@ public interface AdminService {
     SelectAdminVO getAdminById(Integer adminId);
 
     void updateAdmin(AdminUpdateDTO adminUpdateDTO) throws JsonProcessingException;
+
+    void addGeminiSetting(GeminiSetting geminiSetting,Integer id);
+
+    GeminiSetting loadGeminiSettring(Integer id);
 
 }
 

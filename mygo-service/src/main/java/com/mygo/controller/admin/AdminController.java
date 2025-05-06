@@ -5,6 +5,7 @@ import com.mygo.dto.AdminLoginDTO;
 import com.mygo.dto.AdminRegisterDTO;
 import com.mygo.dto.AdminUpdateDTO;
 import com.mygo.dto.ResetPasswordDTO;
+import com.mygo.entity.GeminiSetting;
 import com.mygo.enumeration.Role;
 import com.mygo.result.Result;
 import com.mygo.service.AdminService;
@@ -90,13 +91,13 @@ public class AdminController {
     }
 
     @GetMapping("/users/counselors")
-    public Result<List<SelectAdminVO>> getAllCounselor() {
+    public Result<List<SelectAdminVO>> getAllCounselor() throws JsonProcessingException {
         List<SelectAdminVO> addCounselor = adminService.getAllAdminByRole(Role.COUNSELOR);
         return Result.success(addCounselor);
     }
 
     @GetMapping("/users/supervisors")
-    public Result<List<SelectAdminVO>> getAllSupervisor() {
+    public Result<List<SelectAdminVO>> getAllSupervisor() throws JsonProcessingException {
         List<SelectAdminVO> addCounselor = adminService.getAllAdminByRole(Role.SUPERVISOR);
         return Result.success(addCounselor);
     }
@@ -145,4 +146,16 @@ public class AdminController {
         return Result.success();
     }
 
+    @PostMapping("/geminiSetting/save/{id}")
+    public Result<Void> saveGeminiSetting(@RequestBody GeminiSetting geminiSetting,@PathVariable Integer id) {
+        adminService.addGeminiSetting(geminiSetting,id);
+
+        return Result.success();
+    }
+
+    @GetMapping("/geminiSetting/load/{id}")
+    public Result<GeminiSetting> loadGeminiSetting(@PathVariable Integer id) {
+        adminService.loadGeminiSettring(id);
+        return Result.success(new GeminiSetting());
+    }
 }
