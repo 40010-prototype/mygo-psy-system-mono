@@ -424,7 +424,9 @@ public class AdminServiceImpl implements AdminService {
                     .role(role)
                     .createdAt(counselor.getCreatedAt().toString())
                     .build();
-        } return vo;
+            vo.add(selectCounselorVO);
+        } 
+        return vo;
     }
 
     @Override
