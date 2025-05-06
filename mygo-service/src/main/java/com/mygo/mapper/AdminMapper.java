@@ -3,10 +3,7 @@ package com.mygo.mapper;
 import com.mygo.dto.DateAndStatusDTO;
 import com.mygo.dto.ScheduleStatusDTO;
 import com.mygo.dto.StartAndEndTime;
-import com.mygo.entity.Admin;
-import com.mygo.entity.Consult;
-import com.mygo.entity.Message;
-import com.mygo.entity.TimeSlot;
+import com.mygo.entity.*;
 import com.mygo.enumeration.*;
 import com.mygo.handler.EnumTypeHandler;
 import org.apache.ibatis.annotations.*;
@@ -168,4 +165,13 @@ public interface AdminMapper {
 
         @Update("update admin set real_name=#{realName}, email=#{email}, phone=#{phone} where admin_id=#{adminId}")
         void updateAdminBasicInfo(Integer adminId, String realName, String email, String phone);
+
+        @Insert("insert into admin_api(id,apikey,pro,thinking) value (#{id},#{apikey},#{isPro},#{isThinking})")
+        void addGeminiSetting(Integer id, String apikey, Boolean isPro, Boolean isThinking);
+
+        @Select("select apikey,pro,thinking from admin_api where id=#{id}" )
+        GeminiSetting getGeminiSettingById(Integer id);
+
+        @Update("update admin_api set apikey=#{apikey},pro=#{isPro},thinking=#{isThinking} where id=#{id}")
+        void updateGeminiSetting(Integer id, String apikey, Boolean isPro, Boolean isThinking);
 }

@@ -774,10 +774,11 @@ public class AdminServiceImpl implements AdminService {
                     .email(counselor.getEmail())
                     .profile(counselor.getInfo())
                     .role(role)
-                    .createdAt(counselor.getCreatedAt().toString())
+                    .createdAt(counselor.getCreatedAt()
+                            .toString())
                     .build();
             vo.add(selectCounselorVO);
-
+        }
         return vo;
     }
 
@@ -1150,4 +1151,22 @@ public class AdminServiceImpl implements AdminService {
         // 6. 更新管理员个人资料
         adminMapper.updateAdminInfo(adminId, profileJson);
     }
+
+    @Override
+    public void addGeminiSetting(GeminiSetting geminiSetting,Integer id) {
+        GeminiSetting geminiSettingById = adminMapper.getGeminiSettingById(id);
+        if (geminiSettingById == null) {
+            adminMapper.addGeminiSetting(id,geminiSetting.getApikey(),geminiSetting.getIsPro(),geminiSetting.getIsThinking());
+        }
+        else {
+            adminMapper.updateGeminiSetting(id,geminiSetting.getApikey(),geminiSetting.getIsPro(),geminiSetting.getIsThinking());
+        }
+
+    }
+
+    @Override
+    public GeminiSetting loadGeminiSettring(Integer id) {
+        return adminMapper.getGeminiSettingById(id);
+    }
+
 }
